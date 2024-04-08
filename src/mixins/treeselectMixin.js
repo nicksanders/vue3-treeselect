@@ -8,6 +8,8 @@ import {
   quickDiff, last as getLast, includes, find, removeFromArray,
 } from '../utils'
 
+
+import { getCurrentInstance } from "vue";
 import {
   NO_PARENT_NODE,
   UNCHECKED, INDETERMINATE, CHECKED,
@@ -62,6 +64,7 @@ let instanceId = 0
 
 export default {
   provide() {
+    console.log(getCurrentInstance(), this);
     return {
       // Enable access to the instance of root component of vue-treeselect
       // across hierarchy.

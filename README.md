@@ -1,4 +1,5 @@
 # !FORK! by r2rka
+- !WIP. Migration to Vue3.4 + is in progress
 - Fixed `Cannot read properties of undefined (reading 'name')` error while using with Vue/Vue compat 3+ versions.
 - Fixed `<transition>` `<transition-group>` local declaration.
 - Fixed child components being initialized before `instance` provided. 
