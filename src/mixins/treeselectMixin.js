@@ -686,6 +686,7 @@ export default {
 
       // <searchQuery, remoteSearchEntry> map.
       remoteSearch: createMap(),
+      isReady: false,
     }
   },
 
@@ -916,7 +917,7 @@ export default {
     },
 
     resetFlags() {
-      this._blurOnSelect = false
+      this._blurOnSelect = false;
     },
 
     initialize() {
@@ -1594,12 +1595,12 @@ export default {
             //   isLoaded,
             // })
             normalized.childrenStates = {...createAsyncOptionsStates(),isLoaded}
-            
+
             // this.$ set(normalized, 'isExpanded', typeof isDefaultExpanded === 'boolean'
             //   ? isDefaultExpanded
             //   : level < this.defaultExpandLevel)
             normalized.isExpanded = typeof isDefaultExpanded === 'boolean' ? isDefaultExpanded : level < this.defaultExpandLevel;
-            
+
             // this.$ set(normalized, 'hasMatchedDescendants', false)
             // this.$ set(normalized, 'hasDisabledDescendants', false)
             // this.$ set(normalized, 'isExpandedOnSearch', false)
@@ -1987,6 +1988,7 @@ export default {
   },
 
   mounted() {
+    this.isReady = true;
     if (this.autoFocus) this.focusInput()
     if (!this.options && !this.async && this.autoLoadRootOptions) this.loadRootOptions()
     if (this.alwaysOpen) this.openMenu()

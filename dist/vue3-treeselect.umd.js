@@ -4103,9 +4103,9 @@ if (typeof window !== 'undefined') {
 // EXTERNAL MODULE: external {"commonjs":"vue","commonjs2":"vue","root":"Vue"}
 var external_commonjs_vue_commonjs2_vue_root_Vue_ = __webpack_require__("8bbf");
 
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/vue-loader-v16/dist/templateLoader.js??ref--6!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader-v16/dist??ref--0-1!./src/components/Treeselect.vue?vue&type=template&id=4fa337e8
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/vue-loader-v16/dist/templateLoader.js??ref--6!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader-v16/dist??ref--0-1!./src/components/Treeselect.vue?vue&type=template&id=32fed5d7
 
-function Treeselectvue_type_template_id_4fa337e8_render(_ctx, _cache, $props, $setup, $data, $options) {
+function Treeselectvue_type_template_id_32fed5d7_render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_HiddenFields = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("HiddenFields");
 
   var _component_Control = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("Control");
@@ -4117,6 +4117,8 @@ function Treeselectvue_type_template_id_4fa337e8_render(_ctx, _cache, $props, $s
   return Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createBlock"])("div", {
     ref: "wrapper",
     class: _ctx.wrapperClass
+  }, [_ctx.isReady ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createBlock"])(external_commonjs_vue_commonjs2_vue_root_Vue_["Fragment"], {
+    key: 0
   }, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])(_component_HiddenFields), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])(_component_Control, {
     ref: "control"
   }, null, 512), _ctx.appendToBody ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createBlock"])(_component_MenuPortal, {
@@ -4125,7 +4127,7 @@ function Treeselectvue_type_template_id_4fa337e8_render(_ctx, _cache, $props, $s
   }, null, 512)) : (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createBlock"])(_component_Menu, {
     key: 1,
     ref: "menu"
-  }, null, 512))], 2);
+  }, null, 512))], 64)) : Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createCommentVNode"])("", true)], 2);
 }
 // EXTERNAL MODULE: ./node_modules/core-js/modules/es.array.concat.js
 var es_array_concat = __webpack_require__("99af");
@@ -5153,7 +5155,8 @@ var instanceId = 0;
         countMap: createMap()
       },
       // <searchQuery, remoteSearchEntry> map.
-      remoteSearch: createMap()
+      remoteSearch: createMap(),
+      isReady: false
     };
   },
   computed: {
@@ -6445,6 +6448,7 @@ var instanceId = 0;
     this.resetFlags();
   },
   mounted: function mounted() {
+    this.isReady = true;
     if (this.autoFocus) this.focusInput();
     if (!this.options && !this.async && this.autoLoadRootOptions) this.loadRootOptions();
     if (this.alwaysOpen) this.openMenu();
@@ -8286,7 +8290,7 @@ var placeholder;
 
 
 
-Treeselectvue_type_script_lang_js.render = Treeselectvue_type_template_id_4fa337e8_render
+Treeselectvue_type_script_lang_js.render = Treeselectvue_type_template_id_32fed5d7_render
 
 /* harmony default export */ var Treeselect = (Treeselectvue_type_script_lang_js);
 // EXTERNAL MODULE: ./styles/style.less

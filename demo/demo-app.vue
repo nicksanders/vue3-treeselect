@@ -1,5 +1,5 @@
 <template>
-    
+
 
     <div>
         <vue-treeselect
@@ -15,7 +15,7 @@
             :searchable="false"
             :show-count="true"
         >
-        
+
         </vue-treeselect>
         <div>
             Selected: {{selected}}
@@ -29,7 +29,7 @@ export default defineComponent({
 
     setup() {
 
-        let selected = ref([]);
+        let selected = ref([2, 3]);
         let treeOrientation = ref("0");
         let treeData = reactive({
             label: 'root',
@@ -38,16 +38,16 @@ export default defineComponent({
             children: [
                 { label: 'child 1', id: 2, },
                 { label: 'child 2', id: 3, },
-                { 
-                    label: 'subparent 1', 
-                    id: 4, 
-                    expand: false, 
+                {
+                    label: 'subparent 1',
+                    id: 4,
+                    expand: false,
                     children: [
                         { label: 'subchild 1', id: 5 },
-                        {  
-                            label: 'subchild 2', 
-                            id: 6, 
-                            expand: false, 
+                        {
+                            label: 'subchild 2',
+                            id: 6,
+                            expand: false,
                             children: [
                                 { label: 'subchild 11', id: 7 },
                                 { label: 'subchild 22', id: 8 },
