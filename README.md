@@ -1,5 +1,6 @@
 # !FORK! by r2rka
-- Fixing `Cannot read properties of undefined (reading 'name')` error while using with Vue/Vue compat 3+ versions.
+- Fixed `Cannot read properties of undefined (reading 'name')` error while using with Vue/Vue compat 3+ versions.
+- Fixed `<transition>` `<transition-group>` local declaration.
 
 
 # vue3-treeselect
