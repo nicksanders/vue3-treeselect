@@ -1,3 +1,7 @@
+# !FORK! by r2rka
+- Fixing `Cannot read properties of undefined (reading 'name')` error while using with Vue/Vue compat 3+ versions.
+
+
 # vue3-treeselect
 [![npm](https://badgen.now.sh/npm/v/vue3-treeselect)](https://www.npmjs.com/package/vue3-treeselect)  [![Coverage](https://badgen.net/codecov/c/github/megafetis/vue3-treeselect)](https://codecov.io/gh/megafetis/vue3-treeselect?branch=main)
 ![npm monthly downloads](https://badgen.now.sh/npm/dm/megafetis/vue3-treeselect)
@@ -31,7 +35,7 @@ Breaking changes from his library:
 It's recommended to install vue3-treeselect via npm, and build your app using a bundler like [webpack](https://webpack.js.org/).
 
 ```bash
-npm install --save vue3-treeselect
+npm install --save @r2rka/vue3-treeselect
 ```
 
 This example shows how to integrate vue3-treeselect with your [Vue SFCs](https://vuejs.org/v2/guide/single-file-components.html).
