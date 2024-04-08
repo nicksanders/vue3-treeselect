@@ -6471,7 +6471,7 @@ function stringifyValue(value) {
   render: function render(context) {
     var h = arguments[0];
     var instance = context.instance;
-    if (!instance.name || instance.disabled || !instance.hasValue) return null;
+    if (!instance || !instance.name || instance.disabled || !instance.hasValue) return null;
     var stringifiedValues = instance.internalValue.map(stringifyValue);
     if (instance.multiple && instance.joinValues) stringifiedValues = [stringifiedValues.join(instance.delimiter)];
     return stringifiedValues.map(function (stringifiedValue, i) {
