@@ -55,13 +55,13 @@
     "vue": "^3.0.0"
   },
   "bugs": {
-    "url": "https://github.com/megafetis/vue3-treeselect/issues"
+    "url": "https://github.com/r2rka1/vue3-treeselect/issues"
   },
   "browserslist": [
     "Android >= 4.0",
     "iOS >= 8"
   ],
-  "homepage": "https://github.com/megafetis/vue3-treeselect",
+  "homepage": "https://github.com/r2rka1/vue3-treeselect",
   "files": [
     "dist/*.js",
     "dist/*.css",
@@ -87,6 +87,6 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/megafetis/vue3-treeselect.git"
+    "url": "git+https://github.com/r2rka1/vue3-treeselect"
   }
 }
