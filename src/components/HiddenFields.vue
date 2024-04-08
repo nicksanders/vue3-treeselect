@@ -18,7 +18,7 @@
     render(context) {
       const instance = context.instance
 
-      if (!instance.name || instance.disabled || !instance.hasValue) return null
+      if (!instance || !instance.name || instance.disabled || !instance.hasValue) return null
 
       let stringifiedValues = instance.internalValue.map(stringifyValue)
 
