@@ -1,8 +1,12 @@
 # !FORK! by r2rka
-- !WIP. Migration to Vue3.4 + is in progress
 - Fixed `Cannot read properties of undefined (reading 'name')` error while using with Vue/Vue compat 3+ versions.
 - Fixed `<transition>` `<transition-group>` local declaration.
 - Fixed child components being initialized before `instance` provided. 
+- All `render()` methods replaced with proper `<template>` usage.
+- Main component is fully rewritten using Composition API
+- `v-model` actually works :)
+- Multiple instances work
+- Migrated to use `Vite` as oppose to `webpack` (step towards migrating to Vue 3.4)
 
 
 # vue3-treeselect
