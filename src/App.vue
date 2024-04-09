@@ -32,8 +32,8 @@ export default {
   components: { Treeselect },
   data() {
     return {
-      test: null,
-      test2: null,
+      test: 'b',
+      test2: ['b', 'c'],
       options: [ {
         id: 'a',
         label: 'a',
