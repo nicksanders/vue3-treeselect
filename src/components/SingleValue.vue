@@ -1,8 +1,8 @@
 <template>
-  <div>
-    <template v-if="instance.hasValue && !instance.trigger.searchQuery">
+  <div style="height: 100%">
+    <template v-if="hasValue && !hasActiveQuery">
       <div class="vue-treeselect__value-container">
-        <div class="vue-treeselect__single-value">
+        <div class="vue-treeselect__single-value s-value-container">
           <template v-if="instance.$slots['value-label']">
             {{ instance.$slots['value-label'] }}
           </template>
@@ -10,8 +10,8 @@
         </div>
       </div>
     </template>
-    <Placeholder />,
-    <Input ref="input" />,
+    <Placeholder class="s-value-container" v-if="!hasValue && !hasActiveQuery"/>
+    <Input ref="input" />
   </div>
 </template>
 
@@ -23,5 +23,16 @@
     name: 'vue-treeselect--single-value',
     inject: [ 'instance' ],
     components: { Placeholder, Input },
+    computed: {
+      node() {
+        return this.instance.selectedNodes.value[0];
+      },
+      hasValue() {
+        return  this.instance.hasValue.value;
+      },
+      hasActiveQuery() {
+        return this.instance.trigger.searchQuery;
+      }
+    }
   }
 </script>

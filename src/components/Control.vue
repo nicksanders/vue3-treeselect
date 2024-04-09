@@ -1,6 +1,11 @@
 <template>
   <div class="vue-treeselect__control" @mousedown="instance.handleMouseDown">
-    <component :is="instance.single ? SingleValue : MultiValue" ref="value-container" />
+    <template v-if="instance.single">
+      <SingleValue ref="value-container" />
+    </template>
+    <template v-else>
+      <MultiValue ref="value-container"/>
+    </template>
     <div v-if="shouldShowX" class="vue-treeselect__x-container" :title="getTitleX()" @mousedown="handleMouseDownOnX">
       <DeleteIcon class="vue-treeselect__x" />
     </div>
@@ -69,7 +74,7 @@
 
         return (
           instance.hasValue &&
-          instance.internalValue.some(id => !instance.getNode(id).isDisabled)
+          instance.internalValue.value.some(id => !instance.getNode(id).isDisabled)
         )
       },
       /* eslint-enable valid-jsdoc */

@@ -1,11 +1,11 @@
 <template>
   <div ref="menu-container" class="vue-treeselect__menu-container" :style="menuContainerStyle">
-    <Transition name="vue-treeselect__menu--transition">
-      <div v-if="instance.menu.isOpen" ref="menu" class="vue-treeselect__menu" @mousedown="instance.handleMouseDown" :style="menuStyle">
-        <template v-if="instance.$slots['before-list']">
+    <div v-if="instance.menu.isOpen" ref="menu" class="vue-treeselect__menu" @mousedown="instance.handleMouseDown" :style="menuStyle">
+        <div v-if="instance.$slots['before-list']">
           {{ instance.$slots['before-list'] }}
-        </template>
-        <template v-if="instance.async">
+        </div>
+        <div v-if="instance.async">
+          <div>2</div>
             <Tip v-if="getTipIcon()" type="search-prompt" :icon="getTipIcon()">
               {{ getTipText() }}
               <a v-if="getTipIcon() === 'error'" class="vue-treeselect__retry" @click="instance.handleRemoteSearch" :title="instance.retryTitle">
@@ -16,32 +16,26 @@
           <div v-else class="vue-treeselect__list">
             <Option v-for="rootNode in instance.forest.normalizedOptions" :node="rootNode" :key="rootNode.id" />
           </div>
-        </template>
-        <template v-else>
-          <template v-if="instance.localSearch.active">
+        </div>
+        <div v-else>
+          <div>
             <Tip v-if="getNormalTip()" type="search-prompt" :icon="getNormalTip()[0]">
               {{ getNormalTip()[1] }}
               <a v-if="getNormalTip()[2]" class="vue-treeselect__retry" @click="instance.loadRootOptions" :title="instance.retryTitle">
                 {{ instance.retryText }}
               </a>
             </Tip>
+
             <div v-else class="vue-treeselect__list">
-              <Option v-for="rootNode in instance.forest.normalizedOptions" :node="rootNode" :key="rootNode.id" />
+              <Option v-for="rootNode in normalizedOptions" :node="rootNode" :key="rootNode.id" />
             </div>
-          </template>
-          <template v-else>
-            <Tip v-if="getNormalTip()" type="search-prompt" :icon="getNormalTip()[0]">
-            {{ getNormalTip()[1] }}
-            <a v-if="getNormalTip()[2]" class="vue-treeselect__retry" @click="instance.loadRootOptions" :title="instance.retryTitle">
-              {{ instance.retryText }}
-            </a>
-          </Tip></template>
-        </template>
-        <template v-if="instance.$slots['after-list']">
+
+          </div>
+        </div>
+        <div v-if="instance.$slots['after-list']">
           {{ instance.$slots['after-list'] }}
-        </template>
+        </div>
       </div>
-    </Transition>
   </div>
 </template>
 
@@ -50,7 +44,7 @@
   import { watchSize, setupResizeAndScrollEventListeners } from '../utils'
   import Option from '@/components/Option.vue'
   import Tip from '@/components/Tip.vue'
-  import { Transition } from "vue";
+  import { Transition, toRaw } from "vue";
 
   const directionMap = {
     top: 'top',
@@ -81,6 +75,9 @@
       },
       shouldShowSearchPromptTip() { return this.instance.trigger.searchQuery === '' && !this.instance.defaultOptions },
       entry() { return this.instance.getRemoteSearchEntry() },
+      normalizedOptions() {
+        return toRaw(this.instance.forest.normalizedOptions);
+      }
     },
 
     watch: {
@@ -94,15 +91,10 @@
       },
     },
 
-    created() {
+    mounted() {
       this.menuSizeWatcher = null
       this.menuResizeAndScrollEventListeners = null
-    },
-
-    mounted() {
-      const { instance } = this
-
-      if (instance.menu.isOpen) this.$nextTick(this.onMenuOpen)
+      if (this.instance.menu.isOpen) this.$nextTick(this.onMenuOpen)
     },
 
     unmounted() {

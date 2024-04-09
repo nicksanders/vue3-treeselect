@@ -1,12 +1,12 @@
 <template>
-  <TransitionGroup class="vue-treeselect__multi-value" tag="div" name="vue-treeselect__multi-value-item--transition" :appear="true" >
+  <div>
     <MultiValueItem v-for="node in multiValueItems" :key="`multi-value-item-${node.id}`" :node="node" />
     <div v-if="count > 0" class="vue-treeselect__limit-tip vue-treeselect-helper-zoom-effect-off" key="exceed-limit-tip">
       <span class="vue-treeselect__limit-tip-text">{{ instance.limitText(count) }}</span>
     </div>
-    <Placeholder key="placeholder" />
+    <Placeholder key="placeholder" v-if="!multiValueItems.length" />
     <Input ref="input" key="input" />
-  </TransitionGroup>,
+  </div>
 </template>
 
 <script>
@@ -21,7 +21,7 @@
     components: { Placeholder, TransitionGroup, Input, MultiValueItem },
     computed: {
       multiValueItems() {
-        return this.instance.internalValue
+        return this.instance.internalValue.value
             .slice(0, this.instance.limit)
             .map(this.instance.getNode)
       },

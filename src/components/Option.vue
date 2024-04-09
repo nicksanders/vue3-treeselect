@@ -1,24 +1,29 @@
 <template>
-  <div :class="listItemClass">
-    <div :class="optionClass" @mouseenter="handleMouseEnterOption" :data-id="node.id">
+  <div :class="{
+    'vue-treeselect__list-item': true,
+        [`vue-treeselect__indent-level-${instance.shouldFlattenOptions ? 0 : node.level}`]: true,
+    }">
+    <div :class="{
+       'vue-treeselect__option': true,
+          'vue-treeselect__option--disabled': node.isDisabled,
+          'vue-treeselect__option--selected': instance.isSelected(node),
+          'vue-treeselect__option--highlight': node.isHighlighted,
+          'vue-treeselect__option--matched': instance.localSearch.active && node.isMatched,
+          'vue-treeselect__option--hide': !shouldShow,
+    }" @mouseenter="handleMouseEnterOption" :data-id="node.id">
       <template v-if="!(instance.shouldFlattenOptions && this.shouldShow)">
-        <template v-if="node.isBranch">
-          <div class="vue-treeselect__option-arrow-container" @mousedown="handleMouseDownOnArrow">
-            <Transition name="vue-treeselect__option-arrow--prepare" :appear="true">
+        <div v-if="node.isBranch" class="vue-treeselect__option-arrow-container" @mousedown="handleMouseDownOnArrow">
               <ArrowIcon :class="{
                   'vue-treeselect__option-arrow': true,
                   'vue-treeselect__option-arrow--rotated': shouldExpand,
-                }"
-              />
-            </Transition>
-          </div>
-        </template>
-        <template v-if="instance.hasBranchNodes">
+                }"/>
+        </div>
+        <div v-if="instance.hasBranchNodes">
           <div class="vue-treeselect__option-arrow-placeholder">&nbsp;</div>
-        </template>
+        </div>
       </template>
       <div class="vue-treeselect__label-container" @mousedown="handleMouseDownOnLabelContainer">
-        <template v-if="!instance.single && !(instance.disableBranchNodes && node.isBranch)">
+        <div v-if="!instance.single && !(instance.disableBranchNodes && node.isBranch)">
           <div class="vue-treeselect__checkbox-container">
             <span :class="{ 'vue-treeselect__checkbox': true,
           'vue-treeselect__checkbox--checked': checkedState === CHECKED,
@@ -29,43 +34,43 @@
             <span class="vue-treeselect__minus-mark" />
           </span>
           </div>
-        </template>
-        <template v-if="instance.$slots['option-label']">
+        </div>
+        <div v-if="instance.$slots['option-label']">
           {{ instance.$slots['option-label'] }}
-        </template>
-        <template v-else>
+        </div>
+        <div v-else>
           <label :class="'vue-treeselect__label'">
             {{ node.label }}
             <template v-if="shouldShowCount">
               <span :class="'vue-treeselect__count'">({ getCount() })</span>
             </template>
           </label>
-        </template>
+        </div>
       </div>
     </div>
-    <template v-if="node.isBranch && shouldExpand">
+    <div v-if="node.isBranch && shouldExpand">
       <Transition name="vue-treeselect__list--transition">
         <div class="vue-treeselect__list">
-          <template v-if="node.childrenStates.isLoaded">
-            <vto v-for="childNode in node.children" :node="childNode" :key="childNode.id" />
-          </template>
-          <template v-if="node.childrenStates.isLoaded || !node.children.length">
-            <Tip type="no-children" icon="warning">{ instance.noChildrenText }</Tip>
-          </template>
-          <template v-if="node.childrenStates.isLoading">
+          <div v-if="node.childrenStates.isLoaded">
+            <VueTreeselectOption v-for="childNode in node.children" :node="childNode" :key="childNode.id" />
+          </div>
+          <div v-if="node.childrenStates.isLoaded || !node.children.length">
+            <Tip type="no-children" icon="warning">{{ instance.noChildrenText }}</Tip>
+          </div>
+          <div v-if="node.childrenStates.isLoading">
             <Tip type="loading" icon="loader">{ instance.loadingText }</Tip>
-          </template>
-          <template v-if="node.childrenStates.loadingError">
+          </div>
+          <div v-if="node.childrenStates.loadingError">
             <Tip type="error" icon="error">
               { node.childrenStates.loadingError }
               <a class="vue-treeselect__retry" :title="instance.retryTitle" @mousedown="handleMouseDownOnRetry">
                 {{ instance.retryText }}
               </a>
             </Tip>
-          </template>
+          </div>
         </div>
       </Transition>
-    </template>
+    </div>
   </div>
 </template>
 
@@ -80,9 +85,9 @@
   let arrowPlaceholder, checkMark, minusMark
 
   export default {
-    name: 'vue-treeselect--option',
+    name: 'VueTreeselectOption',
     inject: [ 'instance' ],
-    components: { ArrowIcon, Transition, 'vto': this, Tip },
+    components: { ArrowIcon, Transition, Tip },
     props: {
       node: {
         type: Object,

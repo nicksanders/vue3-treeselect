@@ -59,7 +59,7 @@
 
       inputStyle() {
         return {
-          width: this.needAutoSize ? `${this.inputWidth}px` : null,
+          // width: this.needAutoSize ? `${this.inputWidth}px` : null,
         }
       },
     },

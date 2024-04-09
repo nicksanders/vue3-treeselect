@@ -22,7 +22,7 @@
         return !this.instance || !this.instance.name || this.instance.disabled || !this.instance.hasValue
       },
       values() {
-        let stringifiedValues = this.instance.internalValue.map(this.stringifyValue);
+        let stringifiedValues = this.instance.internalValue.value.map(this.stringifyValue);
         if (this.instance.multiple && this.instance.joinValues) stringifiedValues = [
           stringifiedValues.join(this.instance.delimiter),
         ]

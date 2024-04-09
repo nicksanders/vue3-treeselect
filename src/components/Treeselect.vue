@@ -16,7 +16,7 @@ export default {
 </script>
 
 <script setup>
-import { computed, defineProps, reactive, watch, defineEmits, getCurrentInstance, ref, nextTick, onMounted, provide, useSlots } from 'vue';
+import { computed, defineProps, reactive, watch, defineEmits, getCurrentInstance, ref, nextTick, onMounted, provide, useSlots, toRaw } from 'vue';
 import fuzzysearch from 'fuzzysearch'
 import {
   warning,
@@ -24,6 +24,7 @@ import {
   isNaN, isPromise, once,
   identity, constant, createMap,
   quickDiff, last as getLast, includes, find, removeFromArray,
+  getId,
 } from '../utils'
 import {
   NO_PARENT_NODE,
@@ -42,6 +43,7 @@ const control = ref(null);
 const wrapper = ref(null);
 const portal = ref(null);
 const rmenu = ref(null);
+const instanceId = getId();
 
 const sortValueByIndex = (a, b) => {
   let i = 0
@@ -78,7 +80,19 @@ const match = (enableFuzzyMatch, needle, haystack) => {
 const getErrorMessage = (err) => {
   return err.message || /* istanbul ignore next */String(err)
 }
-let instanceId = 0
+const extractCheckedNodeIdsFromValue = () => {
+  if (props.modelValue == null) return []
+
+  if (props.valueFormat === 'id') {
+    return props.multiple
+        ? props.modelValue.slice()
+        : [ props.modelValue ]
+  }
+
+  return (props.multiple ? props.modelValue : [ props.modelValue ])
+      .map(node => enhancedNormalizer(node))
+      .map(node => node.id)
+};
 
 const emit = defineEmits(['update:modelValue', 'search-change', 'close', 'open', 'select', 'deselect'])
 
@@ -327,16 +341,6 @@ const props = defineProps({
   flat: {
     type: Boolean,
     default: false,
-  },
-
-  /**
-   * Will be passed with all events as the last param.
-   * Useful for identifying events origin.
-   */
-  instanceId: {
-    // Add two trailing "$" to distinguish from explictly specified ids.
-    default: () => `ts$$`,
-    type: [ String, Number ],
   },
 
   /**
@@ -687,7 +691,7 @@ const state = reactive({
     // Has user entered any query to search local options?
     active: false,
     // Has any options matched the search query?
-    noResults: true,
+    noResults: false,
     // <id, countObject> map for counting matched children/descendants.
     countMap: createMap(),
   },
@@ -700,12 +704,15 @@ const state = reactive({
 /** Computed */
 const instance = computed(() => ({
   name: props.name || 'vue-treeselect',
-  hasValue: hasValue.value,
+  hasValue: hasValue,
   trigger: state.trigger,
   forest: state.forest,
   localSearch: state.localSearch,
   remoteSearch: state.remoteSearch,
   isReady: state.isReady,
+  rootOptionsStates: state.rootOptionsStates,
+  internalValue: internalValue,
+  selectedNodes: selectedNodes,
   $slots: slots,
   $refs: {
     control: control.value,
@@ -714,7 +721,7 @@ const instance = computed(() => ({
     menu: rmenu.value,
   },
   menu: state.menu,
-  single: single.value,
+  single: single,
   verifyProps,
   resetFlags,
   initialize,
@@ -803,7 +810,7 @@ const instance = computed(() => ({
   disabled: props.disabled,
   disableFuzzyMatching: props.disableFuzzyMatching,
   flat: props.flat,
-  instanceId: props.instanceId,
+  instanceId: instanceId,
   joinValues: props.joinValues,
   limit: props.limit,
   limitText: props.limitText,
@@ -931,66 +938,21 @@ const hasBranchNodes = computed(() => {
 const shouldFlattenOptions = computed(() => {
   return state.localSearch.active && props.flattenSearchResults
 });
+const computedSearchQuery = computed(() => {
+  return state.trigger.searchQuery;
+})
+const computedModelValue = computed(() => {
+  return props.modelValue;
+})
+const CalwaysOpen = computed(() => props.alwaysOpen)
+const CbranchNodesFirst = computed(() => props.branchNodesFirst)
+const Cdisabled = computed(() => props.disabled)
+const Cflat = computed(() => props.flat)
+const CmatchKeys = computed(() => props.matchKeys)
+const Cmultiple = computed(() => props.multiple)
+const Coptions = computed(() => props.options)
 
 /** Computed END */
-
-/** Watch */
-
-watch(props.alwaysOpen, (newValue) => {
-  if (newValue) openMenu()
-  else closeMenu()
-});
-watch(props.branchNodesFirst, () => {
-  initialize()
-});
-watch(props.disabled, (newValue) => {
-  // force close the menu after disabling the control
-  if (newValue && state.menu.isOpen) closeMenu()
-  else if (!newValue && !state.menu.isOpen && props.alwaysOpen) openMenu()
-});
-watch(props.flat, () => {
-  initialize()
-});
-watch(internalValue.value, (newValue, oldValue) => {
-  const hasChanged = quickDiff(newValue, oldValue)
-  // Vue would trigger this watcher when `newValue` and `oldValue` are shallow-equal.
-  // We emit the `input` event only when the value actually changes.
-  if (hasChanged) emit('update:modelValue', getValue(), getInstanceId())
-});
-watch(props.matchKeys, () => {
-  initialize()
-});
-watch(props.multiple, (newValue) => {
-  // We need to rebuild the state when switching from single-select mode
-  // to multi-select mode.
-  // istanbul ignore else
-  if (newValue) buildForestState()
-});
-watch(props.options, () => {
-    if (props.async) return
-    // Re-initialize options when the `options` prop has changed.
-    initialize()
-    state.rootOptionsStates.isLoaded = Array.isArray(props.options)
-  }, {
-    deep: true,
-    immediate: true,
-  });
-watch(state.trigger.searchQuery, () => {
-  if (props.async) {
-    handleRemoteSearch()
-  } else {
-    handleLocalSearch()
-  }
-
-  emit('search-change', state.trigger.searchQuery, getInstanceId())
-});
-watch(props.modelValue, () => {
-  const nodeIdsFromValue = extractCheckedNodeIdsFromValue()
-  const hasChanged = quickDiff(nodeIdsFromValue, internalValue.value)
-  if (hasChanged) fixSelectedNodeIds(nodeIdsFromValue)
-});
-
-/** Watch END */
 
 /** Methods */
 
@@ -1036,7 +998,7 @@ const resetFlags = () => {
 const initialize = () => {
   const options = props.async
       ? getRemoteSearchEntry().options
-      : props.options
+      : toRaw(props.options)
 
   if (Array.isArray(options)) {
     // In case we are re-initializing options, keep the old state tree temporarily.
@@ -1056,7 +1018,7 @@ const initialize = () => {
   }
 };
 const getInstanceId = () => {
-  return props.instanceId === null ? getCurrentInstance().uid : props.instanceId
+  return instanceId
 };
 const getValue = () => {
   if (props.valueFormat === 'id') {
@@ -1105,19 +1067,7 @@ const createFallbackNode = (id) => {
 
   return state.forest.nodeMap[id] = fallbackNode
 };
-const extractCheckedNodeIdsFromValue = () => {
-  if (props.modelValue == null) return []
 
-  if (props.valueFormat === 'id') {
-    return props.multiple
-        ? props.modelValue.slice()
-        : [ props.modelValue ]
-  }
-
-  return (props.multiple ? props.modelValue : [ props.modelValue ])
-      .map(node => enhancedNormalizer(node))
-      .map(node => node.id)
-};
 const extractNodeFromValue = (id) => {
   const defaultNode = { id }
 
@@ -1283,6 +1233,7 @@ const handleLocalSearch = () => {
   if (!searchQuery) {
     // Exit sync search mode.
     state.localSearch.active = false
+    state.localSearch.noResults = false
     return done()
   }
 
@@ -1396,7 +1347,7 @@ const getMenu = () => {
   // const $menu = ref.$refs.menu.$refs.menu
   // return $menu && $menu.nodeName !== '#comment' ? $menu : null
 
-  return rmenu.value
+  return rmenu.value.$el
 };
 const setCurrentHighlightedOption = (node, scroll = true) => {
   const prev = state.menu.current
@@ -1410,6 +1361,7 @@ const setCurrentHighlightedOption = (node, scroll = true) => {
   if (state.menu.isOpen && scroll) {
     const scrollToOption = () => {
       const $menu = getMenu()
+
       const $option = $menu.querySelector(`.vue-treeselect__option[data-id="${node.id}"]`)
       if ($option) scrollIntoView($menu, $option)
     }
@@ -1794,6 +1746,9 @@ const select = (node) => {
       state._blurOnSelect = true
     }
   }
+
+  emit('update:modelValue', props.multiple ? state.forest.selectedNodeIds : state.forest.selectedNodeIds[0] || null);
+
 };
 const clear = () => {
   if (hasValue.value) {
@@ -1805,6 +1760,7 @@ const clear = () => {
       )
     }
     buildForestState()
+    emit('update:modelValue', null);
   }
 };
 const _selectNode = (node) => {
@@ -1963,6 +1919,64 @@ const handleRemoteSearch = () => {
 };
 
 /** Methods END*/
+
+/** Watch */
+
+watch(CalwaysOpen, (newValue) => {
+  if (newValue) openMenu()
+  else closeMenu()
+});
+watch(CbranchNodesFirst, () => {
+  initialize()
+});
+watch(Cdisabled, (newValue) => {
+  // force close the menu after disabling the control
+  if (newValue && state.menu.isOpen) closeMenu()
+  else if (!newValue && !state.menu.isOpen && props.alwaysOpen) openMenu()
+});
+watch(Cflat, () => {
+  initialize()
+});
+watch(internalValue.value, (newValue, oldValue) => {
+  const hasChanged = quickDiff(newValue, oldValue)
+  // Vue would trigger this watcher when `newValue` and `oldValue` are shallow-equal.
+  // We emit the `input` event only when the value actually changes.
+  if (hasChanged) emit('update:modelValue', getValue(), getInstanceId())
+});
+watch(CmatchKeys, () => {
+  initialize()
+});
+watch(Cmultiple, (newValue) => {
+  // We need to rebuild the state when switching from single-select mode
+  // to multi-select mode.
+  // istanbul ignore else
+  if (newValue) buildForestState()
+});
+watch(Coptions, () => {
+  if (props.async) return
+  // Re-initialize options when the `options` prop has changed.
+  initialize()
+  state.rootOptionsStates.isLoaded = Array.isArray(props.options)
+}, {
+  deep: true,
+  immediate: true,
+});
+watch(computedSearchQuery, () => {
+  if (props.async) {
+    handleRemoteSearch()
+  } else {
+    handleLocalSearch()
+  }
+
+  emit('search-change', state.trigger.searchQuery, getInstanceId())
+});
+watch(computedModelValue, () => {
+  const nodeIdsFromValue = extractCheckedNodeIdsFromValue()
+  const hasChanged = quickDiff(nodeIdsFromValue, internalValue.value)
+  if (hasChanged) fixSelectedNodeIds(nodeIdsFromValue)
+});
+
+/** Watch END */
 
 onMounted(() => {
   verifyProps()

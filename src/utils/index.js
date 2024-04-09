@@ -36,3 +36,4 @@ export { removeFromArray } from '@/utils/removeFromArray'
 // ========================
 
 export { quickDiff } from '@/utils/quickDiff'
+export { getId } from "@/utils/instanceIdSingleton"

@@ -64,7 +64,6 @@ let instanceId = 0
 
 export default {
   provide() {
-    console.log(getCurrentInstance(), this);
     return {
       // Enable access to the instance of root component of vue-treeselect
       // across hierarchy.
