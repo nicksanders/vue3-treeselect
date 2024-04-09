@@ -16,7 +16,7 @@ export default {
 </script>
 
 <script setup>
-import { computed, defineProps, reactive, watch, defineEmit, getCurrentInstance, ref, nextTick, onMounted, provide, useSlots } from 'vue';
+import { computed, defineProps, reactive, watch, defineEmits, getCurrentInstance, ref, nextTick, onMounted, provide, useSlots } from 'vue';
 import fuzzysearch from 'fuzzysearch'
 import {
   warning,
@@ -33,10 +33,10 @@ import {
   ALL_CHILDREN, ALL_DESCENDANTS, LEAF_CHILDREN, LEAF_DESCENDANTS,
   ORDER_SELECTED, LEVEL, INDEX,
 } from '../constants'
-import HiddenFields from './HiddenFields'
-import Control from './Control'
-import Menu from './Menu'
-import MenuPortal from './MenuPortal'
+import HiddenFields from '@/components/HiddenFields.vue'
+import Control from '@/components/Control.vue'
+import Menu from '@/components/Menu.vue'
+import MenuPortal from '@/components/MenuPortal.vue'
 
 const control = ref(null);
 const wrapper = ref(null);
@@ -80,7 +80,7 @@ const getErrorMessage = (err) => {
 }
 let instanceId = 0
 
-const emit = defineEmit(['update:modelValue', 'search-change', 'close', 'open', 'select', 'deselect'])
+const emit = defineEmits(['update:modelValue', 'search-change', 'close', 'open', 'select', 'deselect'])
 
 const slots = useSlots();
 const props = defineProps({
@@ -335,7 +335,7 @@ const props = defineProps({
    */
   instanceId: {
     // Add two trailing "$" to distinguish from explictly specified ids.
-    default: () => `${instanceId++}$$`,
+    default: () => `ts$$`,
     type: [ String, Number ],
   },
 

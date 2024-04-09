@@ -1,5 +1,30 @@
+<template>
+  <div class="vue-treeselect__input-container" :tabindex="!instance.searchable && !instance.disabled ? instance.tabIndex : ''" @focus="!instance.searchable ? onFocus : null" @blur="!instance.searchable ? onBlur : null" @keydown="!instance.searchable ? onKeyDown : null">
+    <template v-if="instance.searchable && !instance.disabled">
+      <input ref="input"
+             class="vue-treeselect__input"
+             type="text"
+             autocomplete="off"
+             :tabIndex="instance.tabIndex"
+             :required="instance.required && !instance.hasValue"
+             :value="value"
+             :style="inputStyle"
+             @focus="onFocus"
+             @input="onInput"
+             @blur="onBlur"
+             @keydown="onKeyDown"
+             @mousedown="onMouseDown"
+      />
+      <template v-if="needAutoSize">
+        <div ref="sizer" class="vue-treeselect__sizer">{{ value }}</div>
+      </template>
+    </template>
+  </div>
+</template>
+
+
 <script>
-  import { debounce, deepExtend, includes } from '../utils'
+  import { debounce, includes } from '../utils'
   import { MIN_INPUT_WIDTH, KEY_CODES, INPUT_DEBOUNCE_DELAY } from '../constants'
 
   const keysThatRequireMenuBeingOpen = [
@@ -50,7 +75,7 @@
       },
     },
 
-    created() {
+    mounted() {
       this.debouncedCallback = debounce(
         this.updateSearchQuery,
         INPUT_DEBOUNCE_DELAY,
@@ -211,69 +236,6 @@
         }
       },
 
-      renderInputContainer() {
-        const { instance } = this
-        const props = {}
-        const children = []
-
-        if (instance.searchable && !instance.disabled) {
-          children.push(this.renderInput())
-          if (this.needAutoSize) children.push(this.renderSizer())
-        }
-
-        if (!instance.searchable) {
-          deepExtend(props, {
-            on: {
-              focus: this.onFocus,
-              blur: this.onBlur,
-              keydown: this.onKeyDown,
-            },
-            ref: 'input',
-          })
-        }
-
-        if (!instance.searchable && !instance.disabled) {
-          deepExtend(props, {
-            attrs: {
-              tabIndex: instance.tabIndex,
-            },
-          })
-        }
-
-        return (
-          <div class="vue-treeselect__input-container" {...props}>
-            {children}
-          </div>
-        )
-      },
-
-      renderInput() {
-        const { instance } = this
-
-        return (
-          <input ref="input"
-            class="vue-treeselect__input"
-            type="text"
-            autocomplete="off"
-            tabIndex={instance.tabIndex}
-            required={instance.required && !instance.hasValue}
-            value={this.value}
-            style={this.inputStyle}
-            onFocus={this.onFocus}
-            onInput={this.onInput}
-            onBlur={this.onBlur}
-            onKeydown={this.onKeyDown}
-            onMousedown={this.onMouseDown}
-          />
-        )
-      },
-
-      renderSizer() {
-        return (
-          <div ref="sizer" class="vue-treeselect__sizer">{this.value}</div>
-        )
-      },
-
       updateInputWidth() {
         this.inputWidth = Math.max(
           MIN_INPUT_WIDTH,
@@ -286,10 +248,6 @@
 
         instance.trigger.searchQuery = this.value
       },
-    },
-
-    render() {
-      return this.renderInputContainer()
     },
   }
 </script>

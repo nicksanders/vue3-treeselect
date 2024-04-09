@@ -1,8 +1,55 @@
+<template>
+  <div ref="menu-container" class="vue-treeselect__menu-container" :style="menuContainerStyle">
+    <Transition name="vue-treeselect__menu--transition">
+      <div v-if="instance.menu.isOpen" ref="menu" class="vue-treeselect__menu" @mousedown="instance.handleMouseDown" :style="menuStyle">
+        <template v-if="instance.$slots['before-list']">
+          {{ instance.$slots['before-list'] }}
+        </template>
+        <template v-if="instance.async">
+            <Tip v-if="getTipIcon()" type="search-prompt" :icon="getTipIcon()">
+              {{ getTipText() }}
+              <a v-if="getTipIcon() === 'error'" class="vue-treeselect__retry" @click="instance.handleRemoteSearch" :title="instance.retryTitle">
+                {{ instance.retryText }}
+              </a>
+            </Tip>
+
+          <div v-else class="vue-treeselect__list">
+            <Option v-for="rootNode in instance.forest.normalizedOptions" :node="rootNode" :key="rootNode.id" />
+          </div>
+        </template>
+        <template v-else>
+          <template v-if="instance.localSearch.active">
+            <Tip v-if="getNormalTip()" type="search-prompt" :icon="getNormalTip()[0]">
+              {{ getNormalTip()[1] }}
+              <a v-if="getNormalTip()[2]" class="vue-treeselect__retry" @click="instance.loadRootOptions" :title="instance.retryTitle">
+                {{ instance.retryText }}
+              </a>
+            </Tip>
+            <div v-else class="vue-treeselect__list">
+              <Option v-for="rootNode in instance.forest.normalizedOptions" :node="rootNode" :key="rootNode.id" />
+            </div>
+          </template>
+          <template v-else>
+            <Tip v-if="getNormalTip()" type="search-prompt" :icon="getNormalTip()[0]">
+            {{ getNormalTip()[1] }}
+            <a v-if="getNormalTip()[2]" class="vue-treeselect__retry" @click="instance.loadRootOptions" :title="instance.retryTitle">
+              {{ instance.retryText }}
+            </a>
+          </Tip></template>
+        </template>
+        <template v-if="instance.$slots['after-list']">
+          {{ instance.$slots['after-list'] }}
+        </template>
+      </div>
+    </Transition>
+  </div>
+</template>
+
 <script>
   import { MENU_BUFFER } from '../constants'
   import { watchSize, setupResizeAndScrollEventListeners } from '../utils'
-  import Option from './Option'
-  import Tip from './Tip'
+  import Option from '@/components/Option.vue'
+  import Tip from '@/components/Tip.vue'
   import { Transition } from "vue";
 
   const directionMap = {
@@ -15,7 +62,7 @@
   export default {
     name: 'vue-treeselect--menu',
     inject: [ 'instance' ],
-
+    components: { Transition, Tip, Option },
     computed: {
       menuStyle() {
         const { instance } = this
@@ -32,6 +79,8 @@
           zIndex: instance.appendToBody ? null : instance.zIndex,
         }
       },
+      shouldShowSearchPromptTip() { return this.instance.trigger.searchQuery === '' && !this.instance.defaultOptions },
+      entry() { return this.instance.getRemoteSearchEntry() },
     },
 
     watch: {
@@ -61,163 +110,52 @@
     },
 
     methods: {
-      renderMenu() {
-        const { instance } = this
-
-        if (!instance.menu.isOpen) return null
-
-        return (
-          <div ref="menu" class="vue-treeselect__menu" onMousedown={instance.handleMouseDown} style={this.menuStyle}>
-            {this.renderBeforeList()}
-            {instance.async
-              ? this.renderAsyncSearchMenuInner()
-              : instance.localSearch.active
-                ? this.renderLocalSearchMenuInner()
-                : this.renderNormalMenuInner()}
-            {this.renderAfterList()}
-          </div>
-        )
-      },
-
-      renderBeforeList() {
-        const { instance } = this
-        const beforeListRenderer = instance.$slots['before-list']
-
-        return beforeListRenderer
-          ? beforeListRenderer()
-          : null
-      },
-
-      renderAfterList() {
-        const { instance } = this
-        const afterListRenderer = instance.$slots['after-list']
-
-        return afterListRenderer
-          ? afterListRenderer()
-          : null
-      },
-
-      renderNormalMenuInner() {
-        const { instance } = this
-
-        if (instance.rootOptionsStates.isLoading) {
-          return this.renderLoadingOptionsTip()
-        } else if (instance.rootOptionsStates.loadingError) {
-          return this.renderLoadingRootOptionsErrorTip()
-        } else if (instance.rootOptionsStates.isLoaded && instance.forest.normalizedOptions.length === 0) {
-          return this.renderNoAvailableOptionsTip()
-        } else {
-          return this.renderOptionList()
-        }
-      },
-
-      renderLocalSearchMenuInner() {
-        const { instance } = this
-
-        if (instance.rootOptionsStates.isLoading) {
-          return this.renderLoadingOptionsTip()
-        } else if (instance.rootOptionsStates.loadingError) {
-          return this.renderLoadingRootOptionsErrorTip()
-        } else if (instance.rootOptionsStates.isLoaded && instance.forest.normalizedOptions.length === 0) {
-          return this.renderNoAvailableOptionsTip()
-        } else if (instance.localSearch.noResults) {
-          return this.renderNoResultsTip()
-        } else {
-          return this.renderOptionList()
-        }
-      },
-
-      renderAsyncSearchMenuInner() {
-        const { instance } = this
-        const entry = instance.getRemoteSearchEntry()
-        const shouldShowSearchPromptTip = instance.trigger.searchQuery === '' && !instance.defaultOptions
+      getTipIcon() {
+        const shouldShowSearchPromptTip = this.instance.trigger.searchQuery === '' && !this.instance.defaultOptions
         const shouldShowNoResultsTip = shouldShowSearchPromptTip
-          ? false
-          : entry.isLoaded && entry.options.length === 0
+            ? false
+            : this.entry.isLoaded && this.entry.options.length === 0
 
         if (shouldShowSearchPromptTip) {
-          return this.renderSearchPromptTip()
-        } else if (entry.isLoading) {
-          return this.renderLoadingOptionsTip()
-        } else if (entry.loadingError) {
-          return this.renderAsyncSearchLoadingErrorTip()
+          return 'warning'
+        } else if (this.entry.isLoading) {
+          return 'loader'
+        } else if (this.entry.loadingError) {
+          return 'error'
         } else if (shouldShowNoResultsTip) {
-          return this.renderNoResultsTip()
-        } else {
-          return this.renderOptionList()
+          return 'warning'
+        }
+
+        return null;
+      },
+      getTipText() {
+        const shouldShowSearchPromptTip = this.instance.trigger.searchQuery === '' && !this.instance.defaultOptions
+        const shouldShowNoResultsTip = shouldShowSearchPromptTip
+            ? false
+            : this.entry.isLoaded && this.entry.options.length === 0
+
+        if (shouldShowSearchPromptTip) {
+          return this.instance.searchPromptText
+        } else if (this.entry.isLoading) {
+          return this.instance.loadingText
+        } else if (this.entry.loadingError) {
+          return this.entry.loadingError
+        } else if (shouldShowNoResultsTip) {
+          return this.instance.noResultsText
         }
       },
+      getNormalTip() {
+        if (this.instance.rootOptionsStates.isLoading) {
+          return ['loader', this.instance.loadingText]
+        } else if (this.instance.rootOptionsStates.loadingError) {
+          return ['error', this.instance.rootOptionsStates.loadingError, this.instance.retryText]
+        } else if (this.instance.rootOptionsStates.isLoaded && this.instance.forest.normalizedOptions.length === 0) {
+          return ['warning', this.instance.noOptionsText]
+        } else if (this.instance.localSearch.noResults) {
+          return ['warning', this.instance.noResultsText]
+        }
 
-      renderOptionList() {
-        const { instance } = this
-
-        return (
-          <div class="vue-treeselect__list">
-            {instance.forest.normalizedOptions.map(rootNode => (
-              <Option node={rootNode} key={rootNode.id} />
-            ))}
-          </div>
-        )
-      },
-
-      renderSearchPromptTip() {
-        const { instance } = this
-
-        return (
-          <Tip type="search-prompt" icon="warning">{ instance.searchPromptText }</Tip>
-        )
-      },
-
-      renderLoadingOptionsTip() {
-        const { instance } = this
-
-        return (
-          <Tip type="loading" icon="loader">{ instance.loadingText }</Tip>
-        )
-      },
-
-      renderLoadingRootOptionsErrorTip() {
-        const { instance } = this
-
-        return (
-          <Tip type="error" icon="error">
-            { instance.rootOptionsStates.loadingError }
-            <a class="vue-treeselect__retry" onClick={instance.loadRootOptions} title={instance.retryTitle}>
-              { instance.retryText }
-            </a>
-          </Tip>
-        )
-      },
-
-      renderAsyncSearchLoadingErrorTip() {
-        const { instance } = this
-        const entry = instance.getRemoteSearchEntry()
-
-        // TODO: retryTitle?
-
-        return (
-          <Tip type="error" icon="error">
-            { entry.loadingError }
-            <a class="vue-treeselect__retry" onClick={instance.handleRemoteSearch} title={instance.retryTitle}>
-              { instance.retryText }
-            </a>
-          </Tip>
-        )
-      },
-
-      renderNoAvailableOptionsTip() {
-        const { instance } = this
-
-        return (
-          <Tip type="no-options" icon="warning">{ instance.noOptionsText }</Tip>
-        )
-      },
-
-      renderNoResultsTip() {
-        const { instance } = this
-        return (
-          <Tip type="no-results" icon="warning">{ instance.noResultsText }</Tip>
-        )
+        return null;
       },
 
       onMenuOpen() {
@@ -298,16 +236,6 @@
         this.menuResizeAndScrollEventListeners.remove()
         this.menuResizeAndScrollEventListeners = null
       },
-    },
-
-    render() {
-      return (
-        <div ref="menu-container" class="vue-treeselect__menu-container" style={this.menuContainerStyle}>
-          <Transition name="vue-treeselect__menu--transition">
-            {this.renderMenu()}
-          </Transition>
-        </div>
-      )
     },
   }
 </script>

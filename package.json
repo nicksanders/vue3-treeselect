@@ -6,21 +6,13 @@
   "unpkg": "dist/vue3-treeselect.umd.js",
   "author": "megafetis",
   "scripts": {
-    "build": "vue-cli-service build --target lib --name vue3-treeselect ./src/index.js && webpack --env.production",
+    "build": "vite build",
+    "preview": "vite preview",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.10",
-    "@babel/preset-env": "^7.12.11",
-    "@babel/preset-typescript": "^7.12.7",
     "@types/ts-nameof": "4.2.1",
-    "@vue/babel-plugin-jsx": "1.0.1",
-    "@vue/babel-preset-jsx": "1.2.4",
-    "@vue/cli-plugin-babel": "~4.5.0",
-    "@vue/cli-plugin-typescript": "~4.5.0",
-    "@vue/cli-service": "~4.5.0",
     "@vue/compiler-sfc": "3.0.5",
-    "babel-loader": "^8.1.0",
     "clean-webpack-plugin": "^3.0.0",
     "copy-webpack-plugin": "^6.0.3",
     "css-loader": "^4.2.0",
@@ -88,5 +80,10 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/r2rka1/vue3-treeselect"
+  },
+  "dependencies": {
+    "@vitejs/plugin-vue": "^5.0.4",
+    "@vitejs/plugin-vue-jsx": "^3.1.0",
+    "vite": "^5.2.8"
   }
 }

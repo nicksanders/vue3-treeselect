@@ -1,16 +1,40 @@
+<template>
+  <div class="vue-treeselect__multi-value-item-container">
+    <div :class="itemClass" @mousedown="handleMouseDown">
+      <template v-if="instance.$slots['value-label']">
+        {{ instance.$slots['value-label'] }}
+      </template>
+      <template v-else>
+        {{ node.label }}
+      </template>
+      <span class="vue-treeselect__icon vue-treeselect__value-remove"><DeleteIcon /></span>
+    </div>
+  </div>
+</template>
+
 <script>
   import { onLeftClick } from '../utils'
-  import DeleteIcon from './icons/Delete'
+  import DeleteIcon from '@/components/icons/Delete.vue'
 
   export default {
     name: 'vue-treeselect--multi-value-item',
     inject: [ 'instance' ],
+    components: { DeleteIcon },
 
     props: {
       node: {
         type: Object,
         required: true,
       },
+    },
+    computed: {
+      itemClass() {
+        return {
+          'vue-treeselect__multi-value-item': true,
+          'vue-treeselect__multi-value-item-disabled': this.node.isDisabled,
+          'vue-treeselect__multi-value-item-new': this.node.isNew,
+        }
+      }
     },
 
     methods: {
@@ -20,26 +44,6 @@
         // Deselect this node.
         instance.select(node)
       }),
-    },
-
-    render() {
-      const { instance, node } = this
-      const itemClass = {
-        'vue-treeselect__multi-value-item': true,
-        'vue-treeselect__multi-value-item-disabled': node.isDisabled,
-        'vue-treeselect__multi-value-item-new': node.isNew,
-      }
-      const customValueLabelRenderer = instance.$slots['value-label']
-      const labelRenderer = customValueLabelRenderer ? customValueLabelRenderer({ node }) : node.label
-
-      return (
-        <div class="vue-treeselect__multi-value-item-container">
-          <div class={itemClass} onMousedown={this.handleMouseDown}>
-            <span class="vue-treeselect__multi-value-label">{ labelRenderer }</span>
-            <span class="vue-treeselect__icon vue-treeselect__value-remove"><DeleteIcon /></span>
-          </div>
-        </div>
-      )
     },
   }
 </script>

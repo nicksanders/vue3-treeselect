@@ -1,34 +1,27 @@
+<template>
+  <div>
+    <template v-if="instance.hasValue && !instance.trigger.searchQuery">
+      <div class="vue-treeselect__value-container">
+        <div class="vue-treeselect__single-value">
+          <template v-if="instance.$slots['value-label']">
+            {{ instance.$slots['value-label'] }}
+          </template>
+          <template v-else>{{ node.label }}</template>
+        </div>
+      </div>
+    </template>
+    <Placeholder />,
+    <Input ref="input" />,
+  </div>
+</template>
+
 <script>
-  import Input from './Input'
-  import Placeholder from './Placeholder'
+  import Input from '@/components/Input.vue'
+  import Placeholder from '@/components/Placeholder.vue'
 
   export default {
     name: 'vue-treeselect--single-value',
     inject: [ 'instance' ],
-    methods: {
-      renderSingleValueLabel() {
-        const { instance } = this
-        const node = instance.selectedNodes[0]
-
-        const customValueLabelRenderer = instance.$slots['value-label']
-        return customValueLabelRenderer
-          ? customValueLabelRenderer({ node })
-          : node.label
-      },
-    },
-    render() {
-      const { instance, $parent: { renderValueContainer } } = this
-      const shouldShowValue = instance.hasValue && !instance.trigger.searchQuery
-
-      return renderValueContainer([
-        shouldShowValue && (
-          <div class="vue-treeselect__single-value">
-            { this.renderSingleValueLabel() }
-          </div>
-        ),
-        <Placeholder />,
-        <Input ref="input" />,
-      ])
-    },
+    components: { Placeholder, Input },
   }
 </script>
