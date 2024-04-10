@@ -1,6 +1,6 @@
 <template>
   <div class="vue-treeselect__control" @mousedown="instance.handleMouseDown">
-    <template v-if="instance.single">
+    <template v-if="isSingle">
       <SingleValue ref="value-container" />
     </template>
     <template v-else>
@@ -36,6 +36,9 @@
       }
     },
     computed: {
+      isSingle() {
+        return this.instance.single.value
+      },
       /* eslint-disable valid-jsdoc */
       /**
        * Should show the "×" button that resets value?

@@ -7,7 +7,8 @@
 > This NPM package is still in progress. Not all the functionality is implemented or tested
 > Please see the progress/roadmap below
 
-[![vue](https://badgen.net/badge/vue/3.0.5/green)](https://badgen.net/badge/vue/3.0.5/green)
+[![vue](https://badgen.net/badge/vue/3.4.21/green)](https://badgen.net/badge/vue/3.0.5/green)
+[![vue](https://badgen.net/badge/node/18+/green)](https://badgen.net/badge/vue/3.0.5/green)
 [![vite](https://badgen.net/badge/vite/5.2.8/green)](https://badgen.net/badge/vite/5.2.8/green)
 ![License](https://badgen.net/github/license/megafetis/vue3-treeselect)
 
