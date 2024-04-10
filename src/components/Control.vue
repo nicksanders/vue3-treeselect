@@ -1,10 +1,20 @@
 <template>
   <div class="vue-treeselect__control" @mousedown="instance.handleMouseDown">
     <template v-if="isSingle">
-      <SingleValue ref="value-container" />
+      <SingleValue ref="value-container">
+        <template v-if="$slots['value-label']" #value-label="{ node }">
+          <slot name="value-label"
+                :node="node"/>
+        </template>
+      </SingleValue>
     </template>
     <template v-else>
-      <MultiValue ref="value-container"/>
+      <MultiValue ref="value-container">
+        <template v-if="$slots['value-label']" #value-label="{ node }">
+          <slot name="value-label"
+                :node="node"/>
+        </template>
+      </MultiValue>
     </template>
     <div v-if="shouldShowX" class="vue-treeselect__x-container" :title="getTitleX()" @mousedown="handleMouseDownOnX">
       <DeleteIcon class="vue-treeselect__x" />

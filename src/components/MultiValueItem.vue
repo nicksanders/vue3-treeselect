@@ -1,9 +1,8 @@
 <template>
   <div class="vue-treeselect__multi-value-item-container">
     <div :class="itemClass" @mousedown="handleMouseDown">
-      <template v-if="instance.$slots['value-label']">
-        {{ instance.$slots['value-label'] }}
-      </template>
+      <slot v-if="$slots['value-label']" name="value-label"
+            :node="node" />
       <template v-else>
         {{ node.label }}
       </template>
@@ -36,7 +35,6 @@
         }
       }
     },
-
     methods: {
       handleMouseDown: onLeftClick(function handleMouseDown() {
         const { instance, node } = this

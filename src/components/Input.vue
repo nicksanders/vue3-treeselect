@@ -1,12 +1,12 @@
 <template>
-  <div class="vue-treeselect__input-container" :tabindex="!instance.searchable && !instance.disabled ? instance.tabIndex : ''" @focus="!instance.searchable ? onFocus : null" @blur="!instance.searchable ? onBlur : null" @keydown="!instance.searchable ? onKeyDown : null">
-    <template v-if="instance.searchable && !instance.disabled">
+  <div class="vue-treeselect__input-container" :tabindex="!isSearchable && !isDisabled ? instance.tabIndex : ''" @focus="!isSearchable ? onFocus : null" @blur="!isSearchable ? onBlur : null" @keydown="!isSearchable ? onKeyDown : null">
+    <template v-if="isSearchable && !isDisabled">
       <input ref="input"
              class="vue-treeselect__input"
              type="text"
              autocomplete="off"
-             :tabIndex="instance.tabIndex"
-             :required="instance.required && !instance.hasValue"
+             :tabIndex="tabIndex"
+             :required="isRequired && !hasValue"
              :value="value"
              :style="inputStyle"
              @focus="onFocus"
@@ -47,6 +47,21 @@
     }),
 
     computed: {
+      isSearchable() {
+        return this.instance.searchable;
+      },
+      isDisabled() {
+        return this.instance.disabled;
+      },
+      isRequired() {
+        return this.instance.required;
+      },
+      tabIndex() {
+        return this.instance.tabIndex;
+      },
+      hasValue() {
+        return this.instance.hasValue.value;
+      },
       needAutoSize() {
         const { instance } = this
 
@@ -121,7 +136,9 @@
         }
 
         instance.trigger.isFocused = false
-        instance.closeMenu()
+        if (instance.closeOnSelect) {
+          instance.closeMenu()
+        }
       },
 
       onInput(evt) {

@@ -11,7 +11,7 @@
 
 @treeselect-font-size: 1em;
 @treeselect-font-size-sm: 12px;
-@treeselect-padding: 5px;
+@treeselect-padding: 10px;
 @treeselect-border-radius-lg: 5px;
 @treeselect-border-radius-sm: 2px;
 @treeselect-narrow-cell-width: 20px;
@@ -175,8 +175,10 @@
 .row() {
   .horizontal-padding(@treeselect-padding);
 
-  display: table;
-  table-layout: fixed;
+  display: flex;
+  flex-flow: row;
+  align-items: center;
+  justify-content: start;
   width: 100%;
 }
 
@@ -449,7 +451,7 @@
 
 .vue-treeselect__multi-value-item-container {
   display: inline-block;
-  padding-top: @treeselect-padding;
+
   padding-right: @treeselect-padding;
   vertical-align: top;
 
@@ -462,10 +464,13 @@
 .vue-treeselect__multi-value-item {
   .clickable();
 
-  display: inline-table;
+  display: flex;
+  flex-flow: row;
+  justify-content: space-between;
   background: @treeselect-multi-value-item-bg;
   // Table elements do not have margin, so we set at the container element.
   padding: @treeselect-multi-value-margin-y @treeselect-multi-value-margin-x;
+  padding-left: 5px;
   border: @treeselect-multi-value-item-border-width solid @treeselect-multi-value-item-border-color;
   border-radius: @treeselect-border-radius-sm;
   color: @treeselect-multi-value-font-color;
@@ -504,16 +509,19 @@
 
 .vue-treeselect__value-remove,
 .vue-treeselect__multi-value-label {
-  display: table-cell;
-  padding: @treeselect-multi-value-padding-y @treeselect-multi-value-padding-x;
+  display: flex;
+  flex-flow: row;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
   vertical-align: middle;
 }
 
 .vue-treeselect__value-remove {
   color: @treeselect-multi-value-remove-color;
-  padding-left: @treeselect-multi-value-padding-x;
   border-left: 1px solid @treeselect-multi-value-divider-color;
   line-height: 0;
+  margin-left: 5px;
 
   [dir="rtl"] & {
     border-left: 0 none;
@@ -570,6 +578,13 @@
   width: 100%;
   outline: none;
 
+  &.as-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 80%;
+  }
+
   .vue-treeselect--single & {
     font-size: @treeselect-single-input-font-size;
     height: 100%;
@@ -586,7 +601,6 @@
   }
 
   .vue-treeselect--searchable.vue-treeselect--multi.vue-treeselect--has-value & {
-    padding-top: @treeselect-padding;
     padding-left: 0;
 
     [dir="rtl"] & {
@@ -795,7 +809,7 @@
   flex-flow: row;
   align-content: center;
   justify-content: start;
-  align-items: self-end;
+  align-items: center;
   .vue-treeselect--single & {
     background: @treeselect-option-selected-bg;
     font-weight: 600;
@@ -817,6 +831,10 @@
 
 .vue-treeselect__option-arrow-container {
   height: 20px;
+  display: flex;
+  flex-flow: row;
+  align-items: center;
+  justify-content: center;
   .clickable();
 }
 

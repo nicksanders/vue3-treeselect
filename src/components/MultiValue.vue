@@ -1,12 +1,15 @@
 <template>
-  <div>
-    <MultiValueItem v-for="node in multiValueItems" :key="`multi-value-item-${node.id}`" :node="node" />
+  <MultiValueItem v-for="node in multiValueItems" :key="`multi-value-item-${node.id}`" :node="node">
+    <template v-if="$slots['value-label']" #value-label="{ node }">
+      <slot name="value-label"
+            :node="node" />
+    </template>
+  </MultiValueItem>
     <div v-if="count > 0" class="vue-treeselect__limit-tip vue-treeselect-helper-zoom-effect-off" key="exceed-limit-tip">
       <span class="vue-treeselect__limit-tip-text">{{ instance.limitText(count) }}</span>
     </div>
     <Placeholder key="placeholder" v-if="!multiValueItems.length" />
     <Input ref="input" key="input" />
-  </div>
 </template>
 
 <script>

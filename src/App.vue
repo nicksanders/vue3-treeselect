@@ -5,12 +5,26 @@
     <Treeselect v-model="test" :options="options"
                 @open="e => handleEvent(e, 'open')"
                 @close="e => handleEvent(e, 'close')"
+                :clear-on-select="false"
                 @update:model-value="e => handleEvent(e, 'update')"
                 @select="e => handleEvent(e, 'select')"
                 @deselect="e => handleEvent(e, 'deselect')"
                 @search-change="e => handleEvent(e, 'search-change')"
                 :close-on-select="false"
-    />
+    >
+      <template #before-list>
+        <div>Before List</div>
+      </template>
+      <template #after-list>
+        <div>After List</div>
+      </template>
+      <template #option-label="{ node, shouldShowCount, count }">
+        <div>{{ node.id }} {{ shouldShowCount }} {{ count }}</div>
+      </template>
+      <template #value-label="{ node }">
+        <div>{{ node.id }}</div>
+      </template>
+    </Treeselect>
 
     <div>MULTIPLE VALUE</div>
 

@@ -2,9 +2,27 @@
   <div ref="wrapper" :class=wrapperClass>
     <template v-if="state.isReady">
       <HiddenFields />
-      <Control ref="control" />
+      <Control ref="control">
+        <template v-if="$slots['value-label']" #value-label="{ node }">
+          <slot name="value-label"
+                :node="node"/>
+        </template>
+      </Control>
       <MenuPortal v-if="appendToBody" ref="portal" />
-      <Menu v-else ref="rmenu" />
+      <Menu v-else ref="rmenu">
+        <template v-if="$slots['before-list']" #before-list>
+          <slot name="before-list" />
+        </template>
+        <template v-if="$slots['after-list']" #after-list>
+          <slot name="after-list" />
+        </template>
+        <template v-if="$slots['option-label']" #option-label="{ node, shouldShowCount, count }">
+          <slot name="option-label"
+                :node="node"
+                :shouldShowCount="shouldShowCount"
+                :count="count"/>
+        </template>
+      </Menu>
     </template>
   </div>
 </template>
@@ -1740,7 +1758,6 @@ const select = (node) => {
 
   if (single.value && props.closeOnSelect) {
     closeMenu()
-
     // istanbul ignore else
     if (props.searchable) {
       state._blurOnSelect = true
@@ -1931,18 +1948,15 @@ watch(CbranchNodesFirst, () => {
 });
 watch(Cdisabled, (newValue) => {
   // force close the menu after disabling the control
-  if (newValue && state.menu.isOpen) closeMenu()
+  if (newValue && state.menu.isOpen) {
+    closeMenu()
+  }
   else if (!newValue && !state.menu.isOpen && props.alwaysOpen) openMenu()
 });
 watch(Cflat, () => {
   initialize()
 });
-watch(internalValue.value, (newValue, oldValue) => {
-  const hasChanged = quickDiff(newValue, oldValue)
-  // Vue would trigger this watcher when `newValue` and `oldValue` are shallow-equal.
-  // We emit the `input` event only when the value actually changes.
-  if (hasChanged) emit('update:modelValue', getValue(), getInstanceId())
-});
+
 watch(CmatchKeys, () => {
   initialize()
 });

@@ -1,11 +1,8 @@
 <template>
   <div ref="menu-container" class="vue-treeselect__menu-container" :style="menuContainerStyle">
     <div v-if="instance.menu.isOpen" ref="menu" class="vue-treeselect__menu" @mousedown="instance.handleMouseDown" :style="menuStyle">
-        <div v-if="instance.$slots['before-list']">
-          {{ instance.$slots['before-list'] }}
-        </div>
-        <div v-if="instance.async">
-          <div>2</div>
+        <slot name="before-list" />
+        <template v-if="instance.async">
             <Tip v-if="getTipIcon()" type="search-prompt" :icon="getTipIcon()">
               {{ getTipText() }}
               <a v-if="getTipIcon() === 'error'" class="vue-treeselect__retry" @click="instance.handleRemoteSearch" :title="instance.retryTitle">
@@ -13,11 +10,18 @@
               </a>
             </Tip>
 
-          <div v-else class="vue-treeselect__list">
-            <Option v-for="rootNode in instance.forest.normalizedOptions" :node="rootNode" :key="rootNode.id" />
-          </div>
-        </div>
-        <div v-else>
+          <template v-else class="vue-treeselect__list">
+            <Option v-for="rootNode in instance.forest.normalizedOptions" :node="rootNode" :key="rootNode.id">
+              <template #option-label="{ node, shouldShowCount, count }">
+                <slot name="option-label"
+                      :node="node"
+                      :shouldShowCount="shouldShowCount"
+                      :count="count" />
+              </template>
+            </Option>
+          </template>
+        </template>
+        <template v-else>
           <div>
             <Tip v-if="getNormalTip()" type="search-prompt" :icon="getNormalTip()[0]">
               {{ getNormalTip()[1] }}
@@ -26,15 +30,20 @@
               </a>
             </Tip>
 
-            <div v-else class="vue-treeselect__list">
-              <Option v-for="rootNode in normalizedOptions" :node="rootNode" :key="rootNode.id" />
-            </div>
+            <template v-else class="vue-treeselect__list">
+              <Option v-for="rootNode in normalizedOptions" :node="rootNode" :key="rootNode.id">
+                <template v-if="$slots['option-label']" #option-label="{ node, shouldShowCount, count }">
+                  <slot name="option-label"
+                        :node="node"
+                        :shouldShowCount="shouldShowCount"
+                        :count="count" />
+                </template>
+              </Option>
+            </template>
 
           </div>
-        </div>
-        <div v-if="instance.$slots['after-list']">
-          {{ instance.$slots['after-list'] }}
-        </div>
+        </template>
+        <slot name="after-list" />
       </div>
   </div>
 </template>

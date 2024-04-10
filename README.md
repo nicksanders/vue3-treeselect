@@ -17,6 +17,8 @@
 * property `value` => `modelValue`
 * event `input` => `updated:modelValue`
 * Now use slots with `<template>`
+* Scoped slots new `API`. Use `<template #slot-name>` instead.
+* `labelClassName` `countClassName` are no longer part of the `#option-label`.
 ----
 [![done](https://badgen.net/badge/Done/&#x2714;/green)](https://badgen.net/badge/vue/3.0.5/green)
 * Replace `render()` with `<template>` &check; 
@@ -27,6 +29,7 @@
 * Use `defineEmits` &check;
 * Rework `SingleValue` &check;
 * Rework `MultipleValue` &check;
+* Rework `scoped slots`  &check;
 * Rework nested values &check;
 * Migrate to `Vite` &check;
 -----
@@ -34,8 +37,8 @@
 * _Use `CompositionAPI` across all components_  &#9874;
 * _Rework/test `async` functionality_  &#9874;
 * _Rework/test `before/after slots`_  &#9874;
-* _Rework/test `scoped slots`_  &#9874;
 * _Accept custom components for nodes/leafs/input/etc_  &#9874;
+* _Rework portal to use vue `<Portal>` instead_  &#9874;
 
 ----
 
@@ -103,6 +106,36 @@ This example shows how to integrate vue3-treeselect with your [Vue SFCs](https:/
       }];
 </script>
 ```
+## Slots Example
+```vue
+<template>
+  <Treeselect v-model="value" :options="options" :close-on-select="false"
+  >
+    /** #before-list */
+    <template #before-list>
+      <div>Before List</div>
+    </template>
+    
+    /** #after-list */
+    <template #after-list>
+      <div>After List</div>
+    </template>
+
+    /**  #option-label */
+    <template #option-label="{ node, shouldShowCount, count }">
+      <div>{{ node.id }} {{ shouldShowCount }} {{ count }}</div>
+    </template>
+
+    /**  #value-label */
+    <template #value-label="{ node }">
+      <div>{{ node.id }}</div>
+    </template>
+    
+  </Treeselect>
+</template>
+```
+
+
 ### Documentation for vue 2 & Live Demo. Be careful with breaking changes above.
 
 [Visit the website](https://vue-treeselect.js.org/)

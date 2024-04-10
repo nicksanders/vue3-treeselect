@@ -1,18 +1,15 @@
 <template>
-  <div style="height: 100%">
     <template v-if="hasValue && !hasActiveQuery">
       <div class="vue-treeselect__value-container">
         <div class="vue-treeselect__single-value s-value-container">
-          <template v-if="instance.$slots['value-label']">
-            {{ instance.$slots['value-label'] }}
-          </template>
+          <slot v-if="$slots['value-label']" name="value-label"
+                :node="node" />
           <template v-else>{{ node.label }}</template>
         </div>
       </div>
     </template>
     <Placeholder class="s-value-container" v-if="!hasValue && !hasActiveQuery"/>
-    <Input ref="input" />
-  </div>
+    <Input ref="input" :class="{ 'as-overlay': hasValue && !hasActiveQuery }" />
 </template>
 
 <script>

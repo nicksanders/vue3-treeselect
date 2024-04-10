@@ -18,12 +18,12 @@
                   'vue-treeselect__option-arrow--rotated': shouldExpand,
                 }"/>
         </div>
-        <div v-if="instance.hasBranchNodes">
+        <template v-if="instance.hasBranchNodes">
           <div class="vue-treeselect__option-arrow-placeholder">&nbsp;</div>
-        </div>
+        </template>
       </template>
       <div class="vue-treeselect__label-container" @mousedown="handleMouseDownOnLabelContainer">
-        <div v-if="!instance.single && !(instance.disableBranchNodes && node.isBranch)">
+        <template v-if="!instance.single && !(instance.disableBranchNodes && node.isBranch)">
           <div class="vue-treeselect__checkbox-container">
             <span :class="{ 'vue-treeselect__checkbox': true,
           'vue-treeselect__checkbox--checked': checkedState === CHECKED,
@@ -34,40 +34,48 @@
             <span class="vue-treeselect__minus-mark" />
           </span>
           </div>
-        </div>
-        <div v-if="instance.$slots['option-label']">
-          {{ instance.$slots['option-label'] }}
-        </div>
-        <div v-else>
+        </template>
+          <slot v-if="$slots['option-label']" name="option-label"
+                :node="node"
+                :shouldShowCount="shouldShowCount"
+                :count="getCount()" />
+        <template v-else>
           <label :class="'vue-treeselect__label'">
             {{ node.label }}
             <template v-if="shouldShowCount">
               <span :class="'vue-treeselect__count'">({ getCount() })</span>
             </template>
           </label>
-        </div>
+        </template>
       </div>
     </div>
     <div v-if="node.isBranch && shouldExpand">
       <Transition name="vue-treeselect__list--transition">
         <div class="vue-treeselect__list">
-          <div v-if="node.childrenStates.isLoaded">
-            <VueTreeselectOption v-for="childNode in node.children" :node="childNode" :key="childNode.id" />
-          </div>
-          <div v-if="node.childrenStates.isLoaded || !node.children.length">
+          <template v-if="node.childrenStates.isLoaded">
+            <VueTreeselectOption v-for="childNode in node.children" :node="childNode" :key="childNode.id">
+              <template v-if="$slots['option-label']" #option-label="{ node, shouldShowCount, count }">
+                <slot name="option-label"
+                      :node="node"
+                      :shouldShowCount="shouldShowCount"
+                      :count="count" />
+              </template>
+            </VueTreeselectOption>
+          </template>
+          <template v-if="node.childrenStates.isLoaded && !node.children.length">
             <Tip type="no-children" icon="warning">{{ instance.noChildrenText }}</Tip>
-          </div>
-          <div v-if="node.childrenStates.isLoading">
+          </template>
+          <template v-if="node.childrenStates.isLoading">
             <Tip type="loading" icon="loader">{ instance.loadingText }</Tip>
-          </div>
-          <div v-if="node.childrenStates.loadingError">
+          </template>
+          <template v-if="node.childrenStates.loadingError">
             <Tip type="error" icon="error">
               { node.childrenStates.loadingError }
               <a class="vue-treeselect__retry" :title="instance.retryTitle" @mousedown="handleMouseDownOnRetry">
                 {{ instance.retryText }}
               </a>
             </Tip>
-          </div>
+          </template>
         </div>
       </Transition>
     </div>
