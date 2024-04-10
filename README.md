@@ -1,26 +1,45 @@
-# !FORK! by r2rka
-- Fixed `Cannot read properties of undefined (reading 'name')` error while using with Vue/Vue compat 3+ versions.
-- Fixed `<transition>` `<transition-group>` local declaration.
-- Fixed child components being initialized before `instance` provided. 
-- All `render()` methods replaced with proper `<template>` usage.
-- Main component is fully rewritten using Composition API
-- `v-model` actually works :)
-- Multiple instances work
-- Migrated to use `Vite` as oppose to `webpack` (step towards migrating to Vue 3.4)
+# @r2rka/vue3-treeselect
+> [!NOTE]
+> Forked from public archive https://megafetis.github.io/vue3-treeselect-demo/
+> In order to continue developing and keeping up with most recent updates
 
+> [!CAUTION]
+> This NPM package is still in progress. Not all the functionality is implemented or tested
+> Please see the progress/roadmap below
 
-# vue3-treeselect
-[![npm](https://badgen.now.sh/npm/v/vue3-treeselect)](https://www.npmjs.com/package/vue3-treeselect)  [![Coverage](https://badgen.net/codecov/c/github/megafetis/vue3-treeselect)](https://codecov.io/gh/megafetis/vue3-treeselect?branch=main)
-![npm monthly downloads](https://badgen.now.sh/npm/dm/megafetis/vue3-treeselect)
- [![Known vulnerabilities](https://snyk.io/test/npm/megafetis/vue3-treeselect/badge.svg)](https://snyk.io/test/npm/megafetis/vue3-treeselect) ![License](https://badgen.net/github/license/megafetis/vue3-treeselect)
+[![vue](https://badgen.net/badge/vue/3.0.5/green)](https://badgen.net/badge/vue/3.0.5/green)
+[![vite](https://badgen.net/badge/vite/5.2.8/green)](https://badgen.net/badge/vite/5.2.8/green)
+![License](https://badgen.net/github/license/megafetis/vue3-treeselect)
 
-> A multi-select component with nested options support for Vue 3. Thank to [riophae](https://github.com/riophae/vue-treeselect) and his sources and library for vue 2 taken as basis.
-
-Breaking changes from his library:
-
+----
+[![done](https://badgen.net/badge/Breaking/&#x203C;/red)](https://badgen.net/badge/vue/3.0.5/green)
 * property `value` => `modelValue`
 * event `input` => `updated:modelValue`
 * Now use slots with `<template>`
+----
+[![done](https://badgen.net/badge/Done/&#x2714;/green)](https://badgen.net/badge/vue/3.0.5/green)
+* Replace `render()` with `<template>` &check; 
+* Use `Composition API` in main component &check; 
+* Remove `mixin` usage &check;
+* Rework `v-model` &check;
+* Use `useSlots` composable &check;
+* Use `defineEmits` &check;
+* Rework `SingleValue` &check;
+* Rework `MultipleValue` &check;
+* Rework nested values &check;
+* Migrate to `Vite` &check;
+-----
+[![done](https://badgen.net/badge/InProgress/&#x2692;/yellow)](https://badgen.net/badge/vue/3.0.5/green)
+* _Use `CompositionAPI` across all components_  &#9874;
+* _Rework/test `async` functionality_  &#9874;
+* _Rework/test `before/after slots`_  &#9874;
+* _Rework/test `scoped slots`_  &#9874;
+* _Accept custom components for nodes/leafs/input/etc_  &#9874;
+
+----
+
+> A multi-select component with nested options support for Vue 3. Thank to [riophae](https://github.com/riophae/vue-treeselect) and his sources and library for vue 2 taken as basis.
+
 
 ![Vue-Treeselect Screenshot](https://raw.githubusercontent.com/riophae/vue-treeselect/master/screenshot.png)
 
@@ -39,107 +58,50 @@ Breaking changes from his library:
 
 ### Getting Started
 
-It's recommended to install vue3-treeselect via npm, and build your app using a bundler like [webpack](https://webpack.js.org/).
-
 ```bash
 npm install --save @r2rka/vue3-treeselect
+```
+```bash
+yarn add @r2rka/vue3-treeselect
 ```
 
 This example shows how to integrate vue3-treeselect with your [Vue SFCs](https://vuejs.org/v2/guide/single-file-components.html).
 
 ```vue
-<!-- Vue SFC -->
 <template>
   <div id="app">
-    <treeselect v-model="value" :multiple="true" :options="options" />
+    <TreeSelect v-model="value" :multiple="true" :options="options" />
   </div>
 </template>
 
-<script>
-  // import the component
-  import Treeselect from 'vue3-treeselect'
-  // import the styles
-  import 'vue3-treeselect/dist/vue3-treeselect.css'
-
-  export default {
-    // register the component
-    components: { Treeselect },
-    data() {
-      return {
-        // define the default value
-        value: null,
-        // define options
-        options: [ {
-          id: 'a',
-          label: 'a',
-          children: [ {
-            id: 'aa',
-            label: 'aa',
-          }, {
-            id: 'ab',
-            label: 'ab',
-          } ],
+<script setup>
+  import { ref } from 'vue';
+  import TreeSelect from '@r2rka/vue3-treeselect'
+  import 'vue3-treeselect/dist/style.css'
+  
+  const value = ref(null);
+  const options = [ 
+      {
+        id: 'a',
+        label: 'a',
+        children: [{
+          id: 'aa',
+          label: 'aa',
         }, {
-          id: 'b',
-          label: 'b',
-        }, {
-          id: 'c',
-          label: 'c',
-        } ],
-      }
-    },
-  }
+          id: 'ab',
+          label: 'ab'
+        }]
+      },
+      {
+        id: 'b',
+        label: 'b',
+      },
+      {
+        id: 'c',
+        label: 'c',
+      }];
 </script>
 ```
-
-If you just don't want to use webpack or any other bundlers, you can simply include the standalone UMD build in your page. In this way, make sure Vue as a dependency is included before vue3-treeselect.
-
-```html
-<html>
-  <head>
-    <!-- include Vue 2.x -->
-    <script src="https://cdn.jsdelivr.net/npm/vue@next"></script>
-    <!-- include vue-treeselect & its styles. you can change the version tag to better suit your needs. -->
-    <script src="https://cdn.jsdelivr.net/npm/vue3-treeselect@^0.1.0/dist/vue3-treeselect.umd.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vue3-treeselect@^0.1.0/dist/vue3-treeselect.min.css">
-  </head>
-  <body>
-    <div id="app">
-      <treeselect v-model="value" :multiple="true" :options="options" />
-    </div>
-  </body>
-  <script>
-      createApp({
-          data: {
-            // define the default value
-            value: null,
-            // define options
-            options: [ {
-            id: 'a',
-            label: 'a',
-            children: [ {
-                id: 'aa',
-                label: 'aa',
-            }, {
-                id: 'ab',
-                label: 'ab',
-            } ],
-            }, {
-            id: 'b',
-            label: 'b',
-            }, {
-            id: 'c',
-            label: 'c',
-            } ],
-        },
-      })
-        .component('treeselect', VueTreeselect.Treeselect)
-        .mount('#app')
-
-  </script>
-</html>
-```
-
 ### Documentation for vue 2 & Live Demo. Be careful with breaking changes above.
 
 [Visit the website](https://vue-treeselect.js.org/)
@@ -157,7 +119,7 @@ It should function well on IE9, but the style can be slightly broken due to the 
 
 ### Bugs
 
-You can [open an issue](https://github.com/megafetis/vue3-treeselect/issues/new).
+You can [open an issue](https://github.com/r2rka1/vue3-treeselect/issues).
 
 ### Contributing
 
@@ -165,8 +127,7 @@ You can [open an issue](https://github.com/megafetis/vue3-treeselect/issues/new)
 2. Install dependencies by `yarn` or `npm install`
 3. Check out a new branch
 4. `npm run dev` & hack
-5. Make sure `npm test` passes
-6. Push your changes & file a pull request
+5. Push your changes & file a pull request
 
 ### Credits
 

@@ -1,6 +1,6 @@
 {
   "name": "@r2rka/vue3-treeselect",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Tree select hierarchical component for vue 3 (next)",
   "main": "dist/r2rka-vue3-treeselect.mjs",
   "unpkg": "dist/r2rka-vue3-treeselect.umd.js",
@@ -72,7 +72,7 @@
     "hierarchy",
     "hierarchical"
   ],
-  "style": "dist/vue3-treeselect.css",
+  "style": "dist/style.css",
   "sideEffects": [
     "*.css",
     "*.less"
