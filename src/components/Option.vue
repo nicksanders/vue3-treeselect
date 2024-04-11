@@ -23,7 +23,7 @@
         </template>
       </template>
       <div class="vue-treeselect__label-container" @mousedown="handleMouseDownOnLabelContainer">
-        <template v-if="!instance.single && !(instance.disableBranchNodes && node.isBranch)">
+        <template v-if="!isSingle && !(instance.disableBranchNodes && node.isBranch)">
           <div class="vue-treeselect__checkbox-container">
             <span :class="{ 'vue-treeselect__checkbox': true,
           'vue-treeselect__checkbox--checked': checkedState === CHECKED,
@@ -52,7 +52,7 @@
     <div v-if="node.isBranch && shouldExpand">
       <Transition name="vue-treeselect__list--transition">
         <div class="vue-treeselect__list">
-          <template v-if="node.childrenStates.isLoaded">
+          <template v-if="childrenStatesLoaded">
             <VueTreeselectOption v-for="childNode in node.children" :node="childNode" :key="childNode.id">
               <template v-if="$slots['option-label']" #option-label="{ node, shouldShowCount, count }">
                 <slot name="option-label"
@@ -62,19 +62,21 @@
               </template>
             </VueTreeselectOption>
           </template>
-          <template v-if="node.childrenStates.isLoaded && !node.children.length">
-            <Tip type="no-children" icon="warning">{{ instance.noChildrenText }}</Tip>
-          </template>
-          <template v-if="node.childrenStates.isLoading">
-            <Tip type="loading" icon="loader">{ instance.loadingText }</Tip>
-          </template>
-          <template v-if="node.childrenStates.loadingError">
-            <Tip type="error" icon="error">
-              { node.childrenStates.loadingError }
-              <a class="vue-treeselect__retry" :title="instance.retryTitle" @mousedown="handleMouseDownOnRetry">
-                {{ instance.retryText }}
-              </a>
-            </Tip>
+          <template v-else>
+            <template v-if="node.childrenStates.isLoaded && !node.children.length">
+              <Tip type="no-children" icon="warning">{{ instance.noChildrenText }}</Tip>
+            </template>
+            <template v-if="node.childrenStates.isLoading">
+              <Tip type="loading" icon="loader">{{ instance.loadingText }}</Tip>
+            </template>
+            <template v-if="node.childrenStates.loadingError">
+              <Tip type="error" icon="error">
+                { node.childrenStates.loadingError }
+                <a class="vue-treeselect__retry" :title="instance.retryTitle" @mousedown="handleMouseDownOnRetry">
+                  {{ instance.retryText }}
+                </a>
+              </Tip>
+            </template>
           </template>
         </div>
       </Transition>
@@ -108,6 +110,9 @@
       }
     },
     computed: {
+      isSingle() {
+        return this.instance.single.value;
+      },
       shouldExpand() {
         const { instance, node } = this
 
@@ -125,6 +130,9 @@
         return this.node.isBranch && (this.instance.localSearch.active
             ? this.instance.showCountOnSearchComputed
             : this.instance.showCount)
+      },
+      childrenStatesLoaded() {
+        return this.node.childrenStates.isLoaded;
       }
     },
 

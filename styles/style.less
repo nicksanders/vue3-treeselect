@@ -583,6 +583,26 @@
     top: 0;
     left: 0;
     width: 80%;
+    display: flex;
+    flex-flow: row;
+    align-items: center;
+    justify-content: center;
+
+    input {
+      font-weight: 500;
+      padding-left: 10px;
+      height: calc(100% - 5px);
+      width: 100%;
+      background-color: #fff;
+      opacity: 0;
+
+      &:focus {
+        opacity: 1;
+        &.is-empty {
+          opacity: 0.5;
+        }
+      }
+    }
   }
 
   .vue-treeselect--single & {

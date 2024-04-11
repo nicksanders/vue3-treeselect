@@ -3,10 +3,6 @@
 > Forked from public archive https://megafetis.github.io/vue3-treeselect-demo/
 > In order to continue developing and keeping up with most recent updates
 
-> [!CAUTION]
-> This NPM package is still in progress. Not all the functionality is implemented or tested
-> Please see the progress/roadmap below
-
 [![vue](https://badgen.net/badge/vue/3.4.21/green)](https://badgen.net/badge/vue/3.0.5/green)
 [![vue](https://badgen.net/badge/node/18+/green)](https://badgen.net/badge/vue/3.0.5/green)
 [![vite](https://badgen.net/badge/vite/5.2.8/green)](https://badgen.net/badge/vite/5.2.8/green)
@@ -32,14 +28,13 @@
 * Rework `scoped slots`  &check;
 * Rework nested values &check;
 * Migrate to `Vite` &check;
------
+* Rework `async`/`async children`/`async search` functionality &check;
+* Rework `async` functionality &check;
+----
 [![done](https://badgen.net/badge/InProgress/&#x2692;/yellow)](https://badgen.net/badge/vue/3.0.5/green)
 * _Use `CompositionAPI` across all components_  &#9874;
-* _Rework/test `async` functionality_  &#9874;
-* _Rework/test `before/after slots`_  &#9874;
-* _Accept custom components for nodes/leafs/input/etc_  &#9874;
-* _Rework portal to use vue `<Portal>` instead_  &#9874;
-
+* _Rework `MenuPortal` to use vue `<Teleport>` instead_  &#9874;
+* _Publish new docs portal_  &#9874;
 ----
 
 > A multi-select component with nested options support for Vue 3. Thank to [riophae](https://github.com/riophae/vue-treeselect) and his sources and library for vue 2 taken as basis.

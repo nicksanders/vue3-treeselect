@@ -8,7 +8,7 @@
     <div v-if="count > 0" class="vue-treeselect__limit-tip vue-treeselect-helper-zoom-effect-off" key="exceed-limit-tip">
       <span class="vue-treeselect__limit-tip-text">{{ instance.limitText(count) }}</span>
     </div>
-    <Placeholder key="placeholder" v-if="!multiValueItems.length" />
+    <Placeholder key="placeholder" v-if="!hasValue && !isFocused" />
     <Input ref="input" key="input" />
 </template>
 
@@ -30,6 +30,12 @@
       },
       count() {
         return this.instance.internalValue.length - this.instance.limit
+      },
+      isFocused() {
+        return this.instance.trigger.isFocused;
+      },
+      hasValue() {
+        return this.instance.hasValue.value;
       }
     },
   }

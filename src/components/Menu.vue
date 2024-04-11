@@ -3,16 +3,16 @@
     <div v-if="instance.menu.isOpen" ref="menu" class="vue-treeselect__menu" @mousedown="instance.handleMouseDown" :style="menuStyle">
         <slot name="before-list" />
         <template v-if="instance.async">
-            <Tip v-if="getTipIcon()" type="search-prompt" :icon="getTipIcon()">
-              {{ getTipText() }}
-              <a v-if="getTipIcon() === 'error'" class="vue-treeselect__retry" @click="instance.handleRemoteSearch" :title="instance.retryTitle">
-                {{ instance.retryText }}
-              </a>
-            </Tip>
+          <Tip v-if="entry.isLoading || !entry.isLoaded || entry.loadingError || !entry.options.length" type="search-prompt" :icon="getTipIcon">
+            {{ getTipText}}
+            <a v-if="getTipIcon === 'error'" class="vue-treeselect__retry" @click="instance.handleRemoteSearch" :title="instance.retryTitle">
+              {{ instance.retryText }}
+            </a>
+          </Tip>
 
           <template v-else class="vue-treeselect__list">
-            <Option v-for="rootNode in instance.forest.normalizedOptions" :node="rootNode" :key="rootNode.id">
-              <template #option-label="{ node, shouldShowCount, count }">
+            <Option v-for="rootNode in normalizedOptions" :node="rootNode" :key="rootNode.id">
+              <template v-if="$slots['option-label']" #option-label="{ node, shouldShowCount, count }">
                 <slot name="option-label"
                       :node="node"
                       :shouldShowCount="shouldShowCount"
@@ -22,10 +22,10 @@
           </template>
         </template>
         <template v-else>
-          <div>
-            <Tip v-if="getNormalTip()" type="search-prompt" :icon="getNormalTip()[0]">
-              {{ getNormalTip()[1] }}
-              <a v-if="getNormalTip()[2]" class="vue-treeselect__retry" @click="instance.loadRootOptions" :title="instance.retryTitle">
+
+            <Tip v-if="getNormalTip" type="search-prompt" :icon="getNormalTip[0]">
+              {{ getNormalTip[1] }}
+              <a v-if="getNormalTip[2]" class="vue-treeselect__retry" @click="instance.loadRootOptions" :title="instance.retryTitle">
                 {{ instance.retryText }}
               </a>
             </Tip>
@@ -41,7 +41,7 @@
               </Option>
             </template>
 
-          </div>
+
         </template>
         <slot name="after-list" />
       </div>
@@ -67,6 +67,25 @@
     inject: [ 'instance' ],
     components: { Transition, Tip, Option },
     computed: {
+      getTipIcon() {
+        const shouldShowSearchPromptTip = this.instance.trigger.searchQuery === '' && !this.instance.defaultOptions
+        const shouldShowNoResultsTip = shouldShowSearchPromptTip
+            ? false
+            : this.entry.isLoaded && this.entry.options.length === 0
+
+        if (shouldShowSearchPromptTip) {
+          return 'warning'
+        } else if (this.entry.isLoading) {
+          return 'loader'
+        } else if (this.entry.loadingError) {
+          return 'error'
+        } else if (shouldShowNoResultsTip) {
+          return 'warning'
+        }
+
+        return null;
+      },
+
       menuStyle() {
         const { instance } = this
 
@@ -82,8 +101,40 @@
           zIndex: instance.appendToBody ? null : instance.zIndex,
         }
       },
+      getTipText() {
+        const shouldShowSearchPromptTip = this.instance.trigger.searchQuery === '' && !this.instance.defaultOptions
+        const shouldShowNoResultsTip = shouldShowSearchPromptTip
+            ? false
+            : this.entry.isLoaded && this.entry.options.length === 0
+
+        if (shouldShowSearchPromptTip) {
+          return this.instance.searchPromptText
+        } else if (this.entry.isLoading) {
+          return this.instance.loadingText
+        } else if (this.entry.loadingError) {
+          return this.entry.loadingError
+        } else if (shouldShowNoResultsTip) {
+          return this.instance.noResultsText
+        }
+        return null;
+      },
+      getNormalTip() {
+        if (this.instance.rootOptionsStates.isLoading) {
+          return ['loader', this.instance.loadingText]
+        } else if (this.instance.rootOptionsStates.loadingError) {
+          return ['error', this.instance.rootOptionsStates.loadingError, this.instance.retryText]
+        } else if (this.instance.rootOptionsStates.isLoaded && this.instance.forest.normalizedOptions.length === 0) {
+          return ['warning', this.instance.noOptionsText]
+        } else if (this.instance.localSearch.noResults) {
+          return ['warning', this.instance.noResultsText]
+        }
+
+        return null;
+      },
       shouldShowSearchPromptTip() { return this.instance.trigger.searchQuery === '' && !this.instance.defaultOptions },
-      entry() { return this.instance.getRemoteSearchEntry() },
+      entry() {
+        return this.instance.getRemoteSearchEntry();
+      },
       normalizedOptions() {
         return toRaw(this.instance.forest.normalizedOptions);
       }
@@ -111,54 +162,6 @@
     },
 
     methods: {
-      getTipIcon() {
-        const shouldShowSearchPromptTip = this.instance.trigger.searchQuery === '' && !this.instance.defaultOptions
-        const shouldShowNoResultsTip = shouldShowSearchPromptTip
-            ? false
-            : this.entry.isLoaded && this.entry.options.length === 0
-
-        if (shouldShowSearchPromptTip) {
-          return 'warning'
-        } else if (this.entry.isLoading) {
-          return 'loader'
-        } else if (this.entry.loadingError) {
-          return 'error'
-        } else if (shouldShowNoResultsTip) {
-          return 'warning'
-        }
-
-        return null;
-      },
-      getTipText() {
-        const shouldShowSearchPromptTip = this.instance.trigger.searchQuery === '' && !this.instance.defaultOptions
-        const shouldShowNoResultsTip = shouldShowSearchPromptTip
-            ? false
-            : this.entry.isLoaded && this.entry.options.length === 0
-
-        if (shouldShowSearchPromptTip) {
-          return this.instance.searchPromptText
-        } else if (this.entry.isLoading) {
-          return this.instance.loadingText
-        } else if (this.entry.loadingError) {
-          return this.entry.loadingError
-        } else if (shouldShowNoResultsTip) {
-          return this.instance.noResultsText
-        }
-      },
-      getNormalTip() {
-        if (this.instance.rootOptionsStates.isLoading) {
-          return ['loader', this.instance.loadingText]
-        } else if (this.instance.rootOptionsStates.loadingError) {
-          return ['error', this.instance.rootOptionsStates.loadingError, this.instance.retryText]
-        } else if (this.instance.rootOptionsStates.isLoaded && this.instance.forest.normalizedOptions.length === 0) {
-          return ['warning', this.instance.noOptionsText]
-        } else if (this.instance.localSearch.noResults) {
-          return ['warning', this.instance.noResultsText]
-        }
-
-        return null;
-      },
-
       onMenuOpen() {
         this.adjustMenuOpenDirection()
         this.setupMenuSizeWatcher()

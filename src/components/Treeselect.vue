@@ -1031,6 +1031,8 @@ const initialize = () => {
     //      of these nodes. (multi-select mode)
     //   3) Async search mode.
     fixSelectedNodeIds(internalValue.value)
+    const { searchQuery } = state.trigger
+    state.remoteSearch[searchQuery] = getRemoteSearchEntry();
   } else {
     state.forest.normalizedOptions = []
   }
@@ -1334,7 +1336,7 @@ const getRemoteSearchEntry = () => {
     state.remoteSearch[searchQuery] = entry;
   }
 
-  return entry
+  return state.remoteSearch[searchQuery];
 };
 const shouldExpand = (node) => {
   return state.localSearch.active ? node.isExpandedOnSearch : node.isExpanded
@@ -1360,11 +1362,6 @@ const getControl = () => {
   return control.value.$el
 };
 const getMenu = () => {
-  // @TODO: sort this out
-  // const ref = props.appendToBody ? portal.value.portalTarget : wrapper.value
-  // const $menu = ref.$refs.menu.$refs.menu
-  // return $menu && $menu.nodeName !== '#comment' ? $menu : null
-
   return rmenu.value.$el
 };
 const setCurrentHighlightedOption = (node, scroll = true) => {
@@ -1665,8 +1662,10 @@ const loadChildrenOptions = (parentNode) => {
       getNode(id).childrenStates.isLoading = true
       getNode(id).childrenStates.loadingError = ''
     },
-    succeed: () => {
-      getNode(id).childrenStates.isLoaded = true
+    succeed: (result) => {
+      const node = getNode(id);
+      node.children = normalize(parentNode, result);
+      node.childrenStates.isLoaded = true
     },
     fail: err => {
       getNode(id).childrenStates.loadingError = getErrorMessage(err)
@@ -1900,7 +1899,7 @@ const handleRemoteSearch = () => {
   const { searchQuery } = state.trigger
   const entry = getRemoteSearchEntry()
   const done = () => {
-    initialize()
+    initialize(entry)
     resetHighlightedOptionWhenNecessary(true)
   }
 
@@ -1920,6 +1919,7 @@ const handleRemoteSearch = () => {
       entry.loadingError = ''
     },
     succeed: options => {
+      entry.isLoading = false
       entry.isLoaded = true
       entry.options = options
       // When the request completes, the search query may have changed.
@@ -1927,6 +1927,7 @@ const handleRemoteSearch = () => {
       if (state.trigger.searchQuery === searchQuery) done()
     },
     fail: err => {
+      entry.isLoading = false
       entry.loadingError = getErrorMessage(err)
     },
     end: () => {
@@ -2000,6 +2001,7 @@ onMounted(() => {
   if (!props.options && !props.async && props.autoLoadRootOptions) loadRootOptions()
   if (props.alwaysOpen) openMenu()
   if (props.async && props.defaultOptions) handleRemoteSearch()
+  buildForestState();
 })
 provide('instance', instance.value);
 </script>

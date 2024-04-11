@@ -1,5 +1,5 @@
 <template>
-    <template v-if="hasValue && !hasActiveQuery">
+    <template v-if="hasValue">
       <div class="vue-treeselect__value-container">
         <div class="vue-treeselect__single-value s-value-container">
           <slot v-if="$slots['value-label']" name="value-label"
@@ -8,8 +8,8 @@
         </div>
       </div>
     </template>
-    <Placeholder class="s-value-container" v-if="!hasValue && !hasActiveQuery"/>
-    <Input ref="input" :class="{ 'as-overlay': hasValue && !hasActiveQuery }" />
+    <Placeholder class="s-value-container" v-if="!hasValue && !isFocused"/>
+    <Input ref="input" :class="{ 'as-overlay': hasValue }" />
 </template>
 
 <script>
@@ -29,7 +29,10 @@
       },
       hasActiveQuery() {
         return this.instance.trigger.searchQuery;
-      }
+      },
+      isFocused() {
+        return this.instance.trigger.isFocused;
+      },
     }
   }
 </script>

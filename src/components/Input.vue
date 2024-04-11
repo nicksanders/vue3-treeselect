@@ -5,6 +5,7 @@
              class="vue-treeselect__input"
              type="text"
              autocomplete="off"
+             :class="{ 'is-empty': isEmpty }"
              :tabIndex="tabIndex"
              :required="isRequired && !hasValue"
              :value="value"
@@ -61,6 +62,9 @@
       },
       hasValue() {
         return this.instance.hasValue.value;
+      },
+      isEmpty() {
+        return !this.value.length
       },
       needAutoSize() {
         const { instance } = this
@@ -136,9 +140,8 @@
         }
 
         instance.trigger.isFocused = false
-        if (instance.closeOnSelect) {
-          instance.closeMenu()
-        }
+
+        this.value = "";
       },
 
       onInput(evt) {
