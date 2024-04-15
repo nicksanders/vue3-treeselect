@@ -320,7 +320,6 @@ const Eo = () => wo++, le = null, ct = 0, un = 1, dn = 2, ue = "ALL_CHILDREN", O
 }, Lo = Yt({
   name: "vue-treeselect--hidden-fields",
   inject: ["instance"],
-  functional: !0,
   computed: {
     canRender() {
       return !this.instance || !this.instance.name || this.instance.disabled || !this.instance.hasValue;
@@ -841,7 +840,6 @@ function dr(e, t, r, c, d, o) {
 }
 const hr = /* @__PURE__ */ H(cr, [["render", dr]]), fr = Yt({
   name: "vue-treeselect--tip",
-  functional: !0,
   props: {
     type: {
       type: String,
