@@ -16,7 +16,6 @@
   export default defineComponent({
     name: 'vue-treeselect--hidden-fields',
     inject: [ 'instance' ],
-    functional: true,
     computed: {
       canRender() {
         return !this.instance || !this.instance.name || this.instance.disabled || !this.instance.hasValue
